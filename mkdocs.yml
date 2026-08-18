@@ -1,0 +1,14 @@
+site_name: MassSpecImporter
+site_url: https://michaelmarty.github.io/MassSpecImporter/
+repo_url: https://github.com/michaelmarty/MassSpecImporter
+theme:
+  name: mkdocs
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Formats and platforms: formats.md
+  - Python API: api.md
+  - Development: development.md
+  - Licensing: licensing.md
+strict: true
+

@@ -1,0 +1,10 @@
+TestData/**/*.mzML filter=lfs diff=lfs merge=lfs -text
+TestData/**/*.gz filter=lfs diff=lfs merge=lfs -text
+TestData/**/*.mzXML filter=lfs diff=lfs merge=lfs -text
+TestData/**/*.RAW filter=lfs diff=lfs merge=lfs -text
+TestData/**/*.npz filter=lfs diff=lfs merge=lfs -text
+TestData/**/*.bin filter=lfs diff=lfs merge=lfs -text
+TestData/**/*.DAT filter=lfs diff=lfs merge=lfs -text
+TestData/**/*.IDX filter=lfs diff=lfs merge=lfs -text
+TestData/**/*.cdt filter=lfs diff=lfs merge=lfs -text
+TestData/**/*.ind filter=lfs diff=lfs merge=lfs -text

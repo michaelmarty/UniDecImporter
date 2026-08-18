@@ -1,0 +1,84 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Unit / ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python-version: "3.10"
+          - os: ubuntu-latest
+            python-version: "3.11"
+          - os: ubuntu-latest
+            python-version: "3.12"
+          - os: ubuntu-latest
+            python-version: "3.13"
+          - os: windows-latest
+            python-version: "3.13"
+          - os: macos-14
+            python-version: "3.13"
+          - os: macos-15-intel
+            python-version: "3.13"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: python -m pip install ".[test]"
+      - run: python -m pytest -m "not integration and not vendor" --cov=MassSpecImporter --cov-report=xml
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: coverage-${{ matrix.os }}-${{ matrix.python-version }}
+          path: coverage.xml
+          if-no-files-found: ignore
+
+  open-format-integration:
+    name: Open formats / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-14]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: git lfs pull
+      - run: python -m pip install ".[test]"
+      - run: python -m pytest -m "integration and not vendor"
+
+  installed-wheel:
+    name: Installed wheel smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade build
+      - run: python -m build --wheel
+      - run: python -m venv "${{ runner.temp }}/wheel-test"
+      - run: "${{ runner.temp }}/wheel-test/bin/python -m pip install dist/*.whl"
+      - name: Import and read outside source tree
+        working-directory: ${{ runner.temp }}
+        run: |
+          printf "100 2\n101 3\n" > spectrum.txt
+          wheel-test/bin/python -c "from MassSpecImporter import get_importer; d=get_importer('spectrum.txt'); assert d.get_avg_scan().shape == (2, 2)"
+

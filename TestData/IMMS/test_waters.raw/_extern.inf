@@ -1,0 +1,218 @@
+Parameters for C:\MassLynx\BlueWater\tuneexp.exp
+Created by 4.1 SCN941
+ 
+ 
+Temperature Correction:
+Temperature Correction				Disabled
+ 
+Instrument Configuration:
+Lteff						1800.0
+Veff						7205.42
+Resolution					20000
+Min Points in Peak				2
+Acquisition Device				WatersADC
+Acquisition Algorithm				ADC Mode
+ADC Trigger Threshold (V)			1.00
+ADC Input Offset (V)				-1.60
+Average Single Ion Intensity			25
+ADC Amplitude Threshold				3
+ADC Centroid Threshold				-1
+ADC Ion Area Threshold				3
+ADC Ion Area Offset				10
+ADC Pushes Per IMS Increment			1
+EDC Delay Coefficient				1.5700
+EDC Delay Offset				1.8100
+ 
+Experimental Instrument Parameters
+Instrument Parameter Filename			C:\MassLynx\ETD_Upgrade.PRO\ACQUDB\Install_April2016_ETD.ipr (MODIFIED)
+Polarity					ES+
+Capillary (kV)					1.5000
+Source Temperature (캜)				100
+Sampling Cone					30.0000
+Discharge Voltage (kV)				0.9
+Discharge Current (uA)				0.0
+Source Offset					30.0000
+MakeUp Gas Flow (mL/min)			25.0
+Desolvation Temperature (캜)			300
+Cone Gas Flow (L/Hr)				60.0
+Desolvation Gas Flow (L/Hr)			300.0
+Nebuliser Gas Flow (Bar)			6.5
+LM Resolution					4.9
+HM Resolution					15.0
+Aperture 1					0.0
+Pre-filter					2.0
+Ion Energy					1.0
+Manual Trap Collision Energy			FALSE
+Trap Collision Energy				5.0
+Manual Transfer Collision Energy		FALSE
+Transfer Collision Energy			0.0
+Manual Gas Control				TRUE
+Trap Gas Flow (mL/min)				1.00
+Transfer Gas Flow (mL/min)			2.80
+IMS Gas Flow (mL/min)				35.00
+HeliumCellGasFlow				180.00
+Detector					2200
+DetectorCache					2150
+Sample Infusion Flow Rate (킠/min)		5
+Sample Flow State				Infusion
+Sample Fill Volume (킠)				250
+Sample Reservoir				A
+LockSpray Infusion Flow Rate (킠/min)		5
+LockSpray Flow State				Infusion
+LockSpray Reservoir				B
+LockSpray Capillary (kV)			1.5
+Use Manual LockSpray Collision Energy		FALSE
+Collision Energy				5.0
+Acceleration1					70.0
+Acceleration2					200.0
+Aperture2					70.0
+Transport1					70.0
+Transport2					70.0
+Steering					-0.10
+Tube Lens					75
+Pusher						1900.0
+Pusher Offset					-0.35
+Puller						1370.0
+Pusher Cycle Time (탎)				Automatic
+Pusher Width (탎)				Automatic
+Collector					50
+Collector Pulse					10.0
+Stopper						10
+Stopper Pulse					20.0
+Entrance					62
+Static Offset					180
+Puller Offset					0.00
+Reflectron Grid (kV)				1.476
+Flight Tube (kV)				10.00
+Reflectron (kV)					3.780
+Use Manual Trap DC				TRUE
+Trap DC Entrance				5.0
+Trap DC Bias					30.0
+TrapGate					-2.0
+Trap DC						-2.0
+Trap DC Exit					-5.0
+Use Manual IMS DC				TRUE
+IMS DC Entrance					10.0
+Helium Cell DC					40.0
+Helium Exit					-20.0
+IMSBias						2.0
+IMS DC Exit					0.0
+USe Manual Transfer DC				FALSE
+Transfer DC Entrance				4.0
+Transfer DC Exit				15.0
+Trap Manual Control				OFF
+Trap Wave Velocity (m/s)			300
+Trap Wave Height (V)				1.0
+IMS Manual Control				OFF
+IMS Wave Velocity (m/s)				300
+IMS Wave Height (V)				15.0
+Transfer Manual Control				ON
+Transfer Wave Velocity (m/s)			450
+Transfer Wave Height (V)			5.0
+Step Wave 1 In Manual Control			OFF
+Enable Reverse Operation			OFF
+Step Wave 1 In Velocity (m/s)			300.0
+Step Wave 1 In Height				10.0
+Step Wave 1 Out Manual Control			OFF
+Step Wave 1 Out Velocity (m/s)			300.0
+Step Wave 1 Out Height				0.0
+Step Wave 2 Manual Control			OFF
+Step Wave 2 Velocity (m/s)			300.0
+Step Wave 2 Height				0.0
+Use Manual Step Wave DC				OFF
+Step Wave TransferOffset			25.0
+Step Wave DiffAperture1				3.0
+Step Wave DiffAperture2				0.0
+Use Automatic RF Settings			TRUE
+StepWave1RFOffset				100.0
+StepWave2RFOffset				100.0
+Target Enhancement Enabled			FALSE
+Target Enhancement Mode				EDC
+Target Enhancement Mass				556.0
+Target Enhancement Trap Height (V)		20.0
+Target Enhancement Extract Height (V)		15.0
+Mobility Trapping Manual Release Enabled	TRUE
+Mobility Trapping Release Time (탎)		500
+Mobility Trap Height (V)			15.0
+Mobility Extract Height (V)			0.0
+Trag Gate LUT table enabled			FALSE
+TriWave Trap Gate LookUp Table			
+Using Drift Time Trimming			TRUE
+Drift Time Bins					0
+Using Mobility Delay after Trap Release		TRUE
+IMS Wave Delay (탎)				1000
+Variable Wave Height Enabled			FALSE
+Wave Height Ramp Type				Linear
+Wave Height Start (V)				8.0
+Wave Height End (V)				20.0
+Wave Height Using Full IMS			TRUE
+Wave Height Ramp (%)				100.0
+Wave Height Look Up Table			
+Variable Wave Velocity Enabled			FALSE
+Wave Velocity Ramp Type				Linear
+Wave Velocity Start (m/s)			300.0
+Wave Velocity End (m/s)				600.0
+Wave Velocity Using Full IMS			TRUE
+Wave Velocity Ramp (%)				100.0
+Wave Velocity Look Up Table			
+Backing						2.98e0
+Source						7.29e-3
+Sample Plate					1.00e-6
+Trap						1.53e-2
+Helium Cell					1.39e3
+IMS						7.76e0
+Transfer					2.99e-2
+TOF						2.30e-6
+IMSRFOffset					300
+IMSMobilityRFOffset				250
+TrapRFOffset					450
+StepWave1RFOffset				300
+StepWave2RFOffset				350
+TransferRFOffset				350
+MS Profile Type					Auto P
+MSProfileMass1					100
+MSProfileDwellTime1				20
+MSProfileRampTime1				20
+MSProfileMass2					300
+MSProfileDwellTime2				20
+MSProfileRampTime2				40
+MSProfileMass3					500
+PusherInterval					138.000000
+PusherOffset					0.250000
+LockMassValidSigma				5
+ 
+Acquisition mass range
+Start mass					1000.000
+End mass					7500.000
+Calibration mass range
+Start mass					158.942
+End mass					1451.033
+ 
+Experiment Reference Compound Name: N/A
+ 
+Function Parameters - Function 1 - MOBILITY MS FUNCTION
+Scan Time (sec)					1.000
+Interscan Time (sec)				0.015
+Start Mass					1000.0
+End Mass					7500.0
+Start Time (mins)				0.00
+End Time (mins)					0.50
+Data Format					Continuum
+Analyser					Resolution Mode
+ADC Sample Frequency (GHz)			3.0
+ADC Pusher Frequency (탎)			138.0
+ADC Pusher Width (탎)				3.50
+Use Tune Page Cone Voltage			YES
+Using Auto Trap Collision Energy (eV)		4.000000
+Use Auto Transfer Collision Energy		NO
+Sensitivity					Normal
+Dynamic Range					Normal
+Save Collapsed Retention Time Data		Yes
+Use Rule File Filtering				No
+FragmentationMode				ETD
+Calibration					Dynamic 2
+ 
+Function Parameters - Function 2 - ETD REFILL FUNCTION
+Refill SetMass					128.00
+Refill Scan Interval Time			1.00
+Refill Scan Time				0.10

@@ -1,0 +1,108 @@
+name: Build and publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_to_pypi:
+        description: Also publish release artifacts to PyPI?
+        required: true
+        default: "false"
+        type: choice
+        options: ["false", "true"]
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: version
+        shell: bash
+        env:
+          PUBLISHED_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version="$(sed -nE 's/^__version__[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' MassSpecImporter/_version.py)"
+          test -n "$version"
+          tag="v$version"
+          if [[ "${{ github.event_name }}" == "release" && "$PUBLISHED_TAG" != "$tag" ]]; then
+            echo "Release tag does not match MassSpecImporter/_version.py" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade build twine
+      - run: python -m build
+      - run: python -m twine check dist/*
+      - name: Reject proprietary or test assets in distributions
+        shell: bash
+        run: |
+          python - <<'PY'
+          import pathlib, tarfile, zipfile
+          bad = (".dll", ".lib", ".tlb")
+          for artifact in pathlib.Path("dist").iterdir():
+              if artifact.suffix == ".whl":
+                  with zipfile.ZipFile(artifact) as archive:
+                      names = archive.namelist()
+              else:
+                  with tarfile.open(artifact) as archive:
+                      names = archive.getnames()
+              forbidden = [name for name in names if name.lower().endswith(bad) or "/testdata/" in name.lower()]
+              if forbidden:
+                  raise SystemExit(f"forbidden files in {artifact}: {forbidden}")
+          PY
+      - uses: actions/upload-artifact@v7
+        with:
+          name: distributions
+          path: dist/*
+          if-no-files-found: error
+
+  github-release:
+    if: github.event_name == 'workflow_dispatch'
+    needs: [metadata, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: distributions
+          path: dist
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.metadata.outputs.tag }}
+        run: gh release create "$RELEASE_TAG" dist/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$RELEASE_TAG" --generate-notes
+
+  publish:
+    if: >-
+      always() &&
+      (github.event_name == 'release' || github.event.inputs.publish_to_pypi == 'true') &&
+      (github.event_name == 'release' || needs.github-release.result == 'success') &&
+      needs.metadata.result == 'success' && needs.build.result == 'success'
+    needs: [metadata, build, github-release]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/mass-spec-importer
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: distributions
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@release/v1

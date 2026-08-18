@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mass-spec-importer"
+dynamic = ["version"]
+description = "Standalone, cross-platform readers for mass-spectrometry data"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "BSD-3-Clause"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+authors = [{ name = "Michael T. Marty", email = "mtmarty@utexas.edu" }]
+keywords = ["mass spectrometry", "mzML", "mzXML", "CD-MS", "ion mobility"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+dependencies = [
+    "h5py>=3.8",
+    "numpy>=1.23",
+    "pymzml>=2.5",
+    "pyteomics>=4.6",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8", "pytest-cov>=5"]
+docs = ["mkdocs>=1.6"]
+release = ["build>=1.2", "twine>=5"]
+thermo = ["pythonnet>=3.0; platform_system == 'Windows' and platform_machine == 'AMD64'"]
+agilent = ["pythonnet>=3.0; platform_system == 'Windows' and platform_machine == 'AMD64'"]
+vendor = ["pythonnet>=3.0; platform_system == 'Windows' and platform_machine == 'AMD64'"]
+
+[project.urls]
+Homepage = "https://github.com/michaelmarty/MassSpecImporter"
+Repository = "https://github.com/michaelmarty/MassSpecImporter"
+Issues = "https://github.com/michaelmarty/MassSpecImporter/issues"
+Documentation = "https://michaelmarty.github.io/MassSpecImporter/"
+
+[tool.setuptools.dynamic]
+version = {attr = "MassSpecImporter._version.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["MassSpecImporter*"]
+
+[tool.setuptools.package-data]
+"MassSpecImporter.Thermo" = ["RawFileReaderLicense.doc"]
+"MassSpecImporter.Waters" = ["Waters_MassLynxSDK_EULA.txt"]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["*.dll", "*.lib"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+markers = [
+    "integration: exercises the bundled, full-size data files",
+    "vendor: requires a locally licensed vendor runtime on Windows x86-64",
+]
+filterwarnings = [
+    "ignore:Testing an element's truth value.*:DeprecationWarning:pymzml.*",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["MassSpecImporter"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
