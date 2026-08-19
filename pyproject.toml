@@ -33,7 +33,7 @@ dependencies = [
     "h5py>=3.8",
     "numpy>=1.23",
     "pymzml>=2.5",
-    "pyteomics>=4.6",
+    "pyteomics[XML]>=4.6",
 ]
 
 [project.optional-dependencies]
