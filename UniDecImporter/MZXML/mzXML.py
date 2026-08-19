@@ -96,7 +96,7 @@ class MZXMLImporter(Importer):
         index = 0
         while index <= scan_range[1] - scan_range[0]:
             try:
-                spec = self.msrun.next()
+                spec = next(self.msrun)
             except:
                 break
             index += 1
@@ -120,7 +120,7 @@ class MZXMLImporter(Importer):
         self.msrun.reset()
         for i, s in enumerate(self.scans):
             try:
-                impdat = get_data_from_spectrum(self.msrun.next(), threshold=threshold)
+                impdat = get_data_from_spectrum(next(self.msrun), threshold=threshold)
                 self.data.append(impdat)
                 newtimes.append(self.times[i])
                 newids.append(s)
@@ -148,7 +148,7 @@ class MZXMLImporter(Importer):
         print("Constructing TIC")
         self.msrun.reset()
         for i, s in enumerate(self.scans):
-            spectrum = self.msrun.next()
+            spectrum = next(self.msrun)
             try:
                 tot = float(spectrum['totIonCurrent'])
             except:
