@@ -20,12 +20,14 @@ recognized_types = list(VENDOR_FORMATS + OPEN_FORMATS)
 
 
 def _is_windows_x64() -> bool:
+    """Return whether the current platform can load the supported vendor SDKs."""
     return platform.system() == "Windows" and platform.machine().lower() in {
         "amd64", "x86_64", "x64"
     }
 
 
 def _vendor_platform_error(vendor: str) -> VendorReaderUnavailableError:
+    """Build a platform error naming the unavailable *vendor* reader."""
     return VendorReaderUnavailableError(
         f"{vendor} data require 64-bit x86 Windows and the bundled vendor runtime; "
         f"current platform is {platform.system()} {platform.machine()}"
@@ -36,10 +38,27 @@ class ImporterFactory:
     """Create the reader appropriate for a path's extension and shape."""
 
     def __init__(self):
+        """Initialize the factory's list of recognized file extensions."""
         self.recognized_file_types = list(recognized_types)
 
     @staticmethod
     def create_importer(file_path, **kwargs):
+        """Create and return the reader appropriate for *file_path*.
+
+        Parameters
+        ----------
+        file_path : str or os.PathLike
+            Mass-spectrometry file, or a Waters ``.raw``/Agilent ``.d`` directory.
+        **kwargs
+            Options forwarded to the selected reader.
+
+        Raises
+        ------
+        UnsupportedFormatError
+            If the path extension is not recognized.
+        VendorReaderUnavailableError
+            If a proprietary reader cannot run on the current platform.
+        """
         path = Path(file_path)
         name = path.name.lower()
         ending = ".mzml.gz" if name.endswith(".mzml.gz") else path.suffix.lower()

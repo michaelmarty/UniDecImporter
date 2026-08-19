@@ -1,10 +1,15 @@
+"""Reader for I2MS and DMT per-ion SQLite databases."""
+
 import sqlite3
 import numpy as np
 from ..Importer import Importer
 
 
 class I2MSImporter(Importer):
+    """Read per-ion CD-MS events from an I2MS/DMT SQLite database."""
+
     def __init__(self, file):
+        """Open *file* and cache its ion table and column metadata."""
         super().__init__(file)
         self.conn = sqlite3.connect(file)
         self.cursor = self.conn.cursor()
@@ -32,6 +37,7 @@ class I2MSImporter(Importer):
         self.chrom_support=False
 
     def get_all_scans(self, threshold=-1):
+        """Return two-column spectra grouped by scan, with optional intensity filtering."""
         scans = []
         for scan in self.scans:
             spectrum = self.get_single_scan(scan)
@@ -41,6 +47,7 @@ class I2MSImporter(Importer):
         return scans
 
     def get_cdms_data(self):
+        """Return all events as m/z, intensity, scan, inverse-time, and time columns."""
         mz = self.data[:, self.mzkey]
         intensity = self.data[:, self.slopekey]
         scans = self.data[:, self.scankey]
@@ -52,15 +59,18 @@ class I2MSImporter(Importer):
         return data_array
 
     def get_cdms_data_by_scans(self, scan_range):
+        """Return CD-MS events within an inclusive scan range."""
         data = self.get_cdms_data()
         mask = np.logical_and(data[:, 2] >= scan_range[0], data[:, 2] <= scan_range[1])
         return data[mask]
 
     def get_single_scan(self, scan=None):
+        """Return one scan as m/z and slope-intensity columns."""
         res = self.data[self.data[:, self.scankey] == scan]
         return np.transpose([res[:, self.mzkey], res[:, self.slopekey]])
 
     def close(self):
+        """Close the SQLite cursor and connection."""
         if getattr(self, "cursor", None):
             self.cursor.close()
             self.cursor = None
@@ -70,9 +80,11 @@ class I2MSImporter(Importer):
 
 
     def get_scan_range(self):
+        """Return the inclusive minimum and maximum scan identifiers."""
         return list(self.scan_range)
 
     def get_avg_scan(self, bins=1, scan_range=None, time_range=None):
+        """Bin and sum CD-MS events into a two-column spectrum."""
         del time_range
         if scan_range is not None:
             all_scans = self.get_cdms_data_by_scans(scan_range)[:, :2]

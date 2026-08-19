@@ -1,3 +1,5 @@
+"""Reader for spectra stored directly in text, NumPy, or binary arrays."""
+
 import os
 import numpy as np
 from .Importer import Importer
@@ -5,7 +7,10 @@ from .ImportTools import header_test
 
 
 class SingleScanImporter(Importer):
+    """Read a single spectrum from TXT, DAT, CSV, NPZ, or BIN data."""
+
     def __init__(self, filename, **kwargs):
+        """Open *filename* and load its array data."""
         super().__init__(filename, **kwargs)
 
         self.scans = [1]
@@ -21,9 +26,11 @@ class SingleScanImporter(Importer):
         self.chrom_support = False
 
     def __len__(self):
+        """Return the number of rows in the loaded array."""
         return len(self.data)
 
     def load_data(self):
+        """Load, validate, cache, and return the source array."""
         if self.data is not None:
             return self.data
         ext = self.ext.lower()
@@ -49,15 +56,19 @@ class SingleScanImporter(Importer):
 
 
     def get_all_scans(self):
+        """Return a one-element list containing the m/z-intensity spectrum."""
         return [self.load_data()[:, :2]]
 
     def get_single_scan(self, scan=None):
+        """Return the sole m/z-intensity spectrum; *scan* is ignored."""
         return self.load_data()[:, :2]
 
     def get_avg_scan(self, scan_range=None, time_range=None):
+        """Return the sole spectrum; range arguments are ignored."""
         return self.load_data()[:, :2]
 
     def get_cdms_data(self):
+        """Return five-column CD-MS events, filling absent metadata with defaults."""
         raw_dat = [self.load_data()]
         mz = np.concatenate([d[:, 0] for d in raw_dat])
         intensity = np.concatenate([d[:, 1] for i, d in enumerate(raw_dat)])
@@ -95,6 +106,7 @@ class SingleScanImporter(Importer):
         return np.transpose([mz, intensity, scans, it, times])
 
     def get_imms_avg_scan(self, scan_range=None, time_range=None, mzbins=None):
+        """Return the first three columns as m/z, drift time, and intensity."""
         del scan_range, time_range, mzbins
         self.immsdata = self.load_data()
         if self.immsdata.shape[1] < 3:
@@ -103,9 +115,11 @@ class SingleScanImporter(Importer):
         return self.immsdata
 
     def get_all_imms_scans(self):
+        """Return a one-element list containing the ion-mobility array."""
         return [self.get_imms_avg_scan()]
 
     def get_imms_scan(self, s):
+        """Return the sole ion-mobility scan; *s* is ignored."""
         return self.get_imms_avg_scan()
 
 

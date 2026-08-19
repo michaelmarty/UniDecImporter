@@ -1,3 +1,5 @@
+"""Shared interface and format-independent operations for mass-spectrometry readers."""
+
 import time
 import os
 import numpy as np
@@ -5,7 +7,22 @@ from . import tools as ud
 from copy import deepcopy
 from .ImportTools import merge_spectra, merge_im_spectra, IndexedFile, IndexedScan
 class Importer:
+    """Base class for all UniDecImporter readers.
+
+    Subclasses populate scan metadata and implement the format-specific spectrum access
+    methods. Scan ranges used by this API are inclusive.
+    """
+
     def __init__(self, file_path, **kwargs):
+        """Initialize common reader state for *file_path*.
+
+        Parameters
+        ----------
+        file_path : str or os.PathLike
+            Existing data file or vendor-data directory.
+        **kwargs
+            Reader-specific options retained in :attr:`_params`.
+        """
         if not os.path.exists(file_path):
             raise FileNotFoundError(file_path)
         self._file_path = file_path
@@ -30,9 +47,11 @@ class Importer:
 
 
     def get_polarity(self, scan=None):
+        """Return the ion polarity, optionally for a particular scan."""
         return self.polarity
 
     def get_ms_order(self, scan=1):
+        """Return the MS level for *scan*, defaulting to MS1 when unavailable."""
         if self.levels is not None:
             index = self.get_scan_index(scan)
             return self.levels[index]
@@ -41,23 +60,29 @@ class Importer:
 
     # list of all scans
     def get_all_scans(self):
+        """Return all spectra as a list of ``N x 2`` m/z-intensity arrays."""
         raise NotImplementedError
 
     # averaged scans
     def get_avg_scan(self, scan_range=None, time_range=None):
+        """Return a merged spectrum for an inclusive scan or retention-time range."""
         raise NotImplementedError
 
     # Single scan data
     def get_single_scan(self, scan):
+        """Return one scan as an ``N x 2`` m/z-intensity array."""
         raise NotImplementedError
 
     def get_max_time(self):
+        """Return the final retention time in minutes."""
         return self.times[-1]
 
     def get_max_scan(self):
+        """Return the final scan identifier."""
         return self.scans[-1]
 
     def get_scans_from_times(self, time_range):
+        """Convert a two-value retention-time range to inclusive scan identifiers."""
         mins = self.get_time_scan(time_range[0])
         if time_range[1] - time_range[0] > 0:
             maxs = self.get_time_scan(time_range[1])
@@ -66,6 +91,7 @@ class Importer:
             return [mins, mins]
 
     def get_times_from_scans(self, scan_range):
+        """Return start, midpoint, and end times for an inclusive scan range."""
         mint = self.get_scan_time(scan_range[0])
         if scan_range[1] - scan_range[0] > 1:
             maxt = self.get_scan_time(scan_range[1])
@@ -80,12 +106,18 @@ class Importer:
             return [mint, mint, mint]
 
     def get_tic(self):
+        """Return the total-ion chromatogram as time and intensity columns."""
         if not self.chrom_support:
             print("TIC data not supported for this file type:", self._file_path)
             raise NotImplementedError("chromatograms are not supported by this reader")
         raise NotImplementedError
 
     def index_scans(self, min_mz, bin_width):
+        """Build an in-memory MS1 peak index for extracted-ion chromatograms.
+
+        Parameters are the lower m/z origin and positive bin width used by the index.
+        Existing indexes are replaced.
+        """
         if not self.chrom_support:
             print("Indexing not supported for this file type:", self._file_path)
             raise NotImplementedError("scan indexing is not supported by this reader")
@@ -101,6 +133,11 @@ class Importer:
         return
 
     def get_eic(self, mass, mz_tol, rt_range=None):
+        """Return an extracted-ion chromatogram around *mass*.
+
+        ``mz_tol`` is an absolute m/z tolerance. ``rt_range``, when supplied, is a
+        two-value retention-time range in minutes.
+        """
         if not self.chrom_support:
             print("EIC data not supported for this file type:", self._file_path)
             raise NotImplementedError("chromatograms are not supported by this reader")
@@ -110,12 +147,14 @@ class Importer:
             return self.indexed_file.extract_xic(mass, mz_tol, rt_range)
 
     def get_scan_time(self, scan):
+        """Return the retention time in minutes for *scan*."""
         # Find index in self.scans
         index = self.get_scan_index(scan)
         t = self.times[index]
         return t
 
     def get_scan_index(self, scan):
+        """Return the array index for *scan*, clamping outside identifiers to the ends."""
         if scan in self.scans:
             index = np.where(np.array(self.scans) == scan)[0][0]
         elif scan < self.scans[0]:
@@ -127,11 +166,13 @@ class Importer:
         return index
 
     def get_time_scan(self, time):
+        """Return the scan identifier nearest to a retention time in minutes."""
         index = np.argmin(np.abs(self.times - time))
         scan = self.scans[index]
         return scan
 
     def check_centroided(self):
+        """Estimate whether the first scan is centroided using intensity autocorrelation."""
         scan_data = self.get_single_scan(self.scan_range[0])
         ratio = ud.get_autocorr_ratio(scan_data)
         print(f"Autocorr ratio {round(ratio, 3)}")
@@ -142,6 +183,11 @@ class Importer:
         return self.centroided
 
     def scan_range_from_inputs(self, scan_range=None, time_range=None):
+        """Resolve and clamp scan/time selection inputs to an inclusive scan range.
+
+        A supplied ``time_range`` takes precedence over ``scan_range``. If neither is
+        supplied, the reader's complete :attr:`scan_range` is returned.
+        """
         if scan_range is None and time_range is None:
             scan_range = self.scan_range
         elif time_range is not None:
@@ -160,6 +206,7 @@ class Importer:
         return scan_range
 
     def avg_fast(self, scan_range=None, time_range=None):
+        """Merge cached spectra over an inclusive scan or retention-time range."""
         if self.data is None:
             self.get_all_scans()
 
@@ -189,6 +236,7 @@ class Importer:
         return data
 
     def get_cdms_data(self, scan_range=None):
+        """Return CD-MS events as m/z, intensity, scan, inverse-time, and time columns."""
         if not self.cdms_support:
             print("CDMS data not supported for this file type:", self._file_path)
             raise NotImplementedError("CD-MS data are not supported by this reader")
@@ -205,6 +253,11 @@ class Importer:
         return data_array
 
     def get_imms_avg_scan(self, scan_range=None, time_range=None, mzbins=1):
+        """Merge ion-mobility scans into m/z, drift-time, and intensity columns.
+
+        ``mzbins`` selects the linear m/z bin width; a false-like value requests the
+        automatically estimated nonlinear axis.
+        """
         if not self.imms_support:
             print("IMMS data not supported for this file type:", self._file_path)
             raise NotImplementedError("ion-mobility data are not supported by this reader")
@@ -241,6 +294,7 @@ class Importer:
         return data
 
     def get_imms_scan(self, s):
+        """Return one ion-mobility scan as m/z, drift-time, and intensity columns."""
         if not self.imms_support:
             print("IMMS data not supported for this file type:", self._file_path)
             raise NotImplementedError("ion-mobility data are not supported by this reader")
@@ -254,11 +308,17 @@ class Importer:
         return data
 
     def get_all_imms_scans(self):
+        """Load and return every ion-mobility scan in scan order."""
         if not self.imms_support:
             print("IMMS data not supported for this file type:", self._file_path)
             raise NotImplementedError("ion mobility data are not supported by this reader")
 
     def get_mz_localmax(self, mz, mz_tol):
+        """Return local peak m/z and intensity pairs across scans.
+
+        ``mz_tol`` is interpreted in parts per million around the target ``mz``.
+        Scans without a peak in the window are omitted.
+        """
         if self.data is None:
             self.get_all_scans()
         if self.data is None or ud.isempty(self.data):
@@ -279,12 +339,15 @@ class Importer:
 
 
     def close(self):
+        """Release resources held by the reader; the base implementation is a no-op."""
         return None
 
     def __enter__(self):
+        """Return this reader when entering a context manager."""
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """Close the reader when leaving a context manager without suppressing errors."""
         self.close()
         return False
 

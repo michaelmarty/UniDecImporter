@@ -1,3 +1,5 @@
+"""High-level Thermo RAW importer backed by RawFileReader."""
+
 import numpy as np
 
 from ..Importer import Importer
@@ -11,6 +13,7 @@ class ThermoImporter(Importer):
     Note: Thermo scans are 1 indexed, so the first scan is scan 1, not scan 0.
     """
     def __init__(self, path, silent=False, **kwargs):
+        """Open a Thermo RAW file and initialize scan metadata."""
         super().__init__(path, **kwargs)
 
         if not silent:
@@ -25,6 +28,7 @@ class ThermoImporter(Importer):
         self.thermo_support = True
 
     def init_scans(self):
+        """Load the scan range and retention times from RawFileReader."""
         self.scan_range = self.msrun.scan_range
         self.scans = np.arange(self.scan_range[0], self.scan_range[1] + 1)
         self.times = []
@@ -35,6 +39,7 @@ class ThermoImporter(Importer):
         print("Number of Scans", len(self.scans))
 
     def get_all_scans(self, threshold=-1):
+        """Load all profile scans, optionally filtering by intensity."""
         self.data = []
         for s in self.scans:
             impdat = np.array(self.msrun.GetSpectrum(s))
@@ -45,6 +50,7 @@ class ThermoImporter(Importer):
         return self.data
 
     def get_all_centroid_scans(self, threshold=-1):
+        """Load all centroid scans, optionally filtering by intensity."""
         self.data = []
         for s in self.scans:
             impdat = np.array(self.msrun.GetCentroidSpectrum(s))
@@ -55,16 +61,19 @@ class ThermoImporter(Importer):
         return self.data
 
     def get_single_scan(self, s):
+        """Return one profile scan as an m/z-intensity array."""
         impdat = np.array(self.msrun.GetSpectrum(int(s)))
         impdat = impdat[impdat[:, 0] > 10]
         return impdat
 
     def grab_centroid_data(self, s):
+        """Return one centroid scan as an m/z-intensity array."""
         impdat = np.array(self.msrun.GetCentroidSpectrum(int(s)))
         impdat = impdat[impdat[:, 0] > 10]
         return impdat
 
     def grab_all_centroid_dat(self):
+        """Concatenate centroid peaks from every scan."""
         data = []
         for i in range(len(self.scans)):
             impdat = np.array(self.msrun.GetCentroidSpectrum(self.scans[i]))
@@ -77,10 +86,7 @@ class ThermoImporter(Importer):
             return np.empty((0, 2))
 
     def get_avg_scan(self, scan_range=None, time_range=None):
-        """
-        Returns merged 1D MS data from mzML import
-        :return: merged data
-        """
+        """Return a RawFileReader average over an inclusive scan or time range."""
         scan_range = self.scan_range_from_inputs(scan_range, time_range)
 
         if scan_range[1] - scan_range[0] > 1:
@@ -95,9 +101,11 @@ class ThermoImporter(Importer):
         return data
 
     def get_tic(self):
+        """Return the total-ion chromatogram."""
         return self.msrun.GetChromatogram()
 
     def get_eic(self, mass, mz_tol, rt_range=None):
+        """Return an extracted-ion chromatogram for the selected time range."""
         mass_range = [mass-(mz_tol/2), mass+(mz_tol/2)]
         if rt_range is not None:
             min_idx = int(np.argmin(np.abs(self.times - rt_range[0])))
@@ -108,6 +116,7 @@ class ThermoImporter(Importer):
         return self.msrun.Get_EIC(massrange=mass_range, scanrange=scan_range)
 
     def get_inj_time_array(self):
+        """Return ion injection times aligned with the scan list."""
         its = []
         for i, s in enumerate(self.scans):
             it, res, an1, an2 = self.msrun.get_scan_header(s)
@@ -120,6 +129,7 @@ class ThermoImporter(Importer):
         return np.array(its)
 
     def get_analog_voltage1(self):
+        """Return the first analog-voltage header value for each scan."""
         vs = []
         for i, s in enumerate(self.scans):
             it, res, an1, an2 = self.msrun.get_scan_header(s)
@@ -127,6 +137,7 @@ class ThermoImporter(Importer):
         return np.array(vs)
 
     def get_analog_voltage2(self):
+        """Return the second analog-voltage header value for each scan."""
         vs = []
         for i, s in enumerate(self.scans):
             it, res, an1, an2 = self.msrun.get_scan_header(s)
@@ -134,6 +145,7 @@ class ThermoImporter(Importer):
         return np.array(vs)
 
     def get_polarity(self, scan=1):
+        """Return the polarity encoded in a scan event string."""
         # print(dir(self.msrun.source))
         scan_mode = self.msrun.source.GetScanEventStringForScanNumber(int(scan))
         if "+" in scan_mode:
@@ -146,10 +158,12 @@ class ThermoImporter(Importer):
         return None
 
     def get_ms_order(self, scan=1):
+        """Return the MS level reported by RawFileReader."""
         order = self.msrun.GetMSOrder(int(scan))
         return order
 
     def get_isolation_mz_width(self, s):
+        """Return precursor m/z and isolation width for a reaction scan."""
         scanFilter = self.msrun.GetScanFilter(int(s))
         reaction = scanFilter.GetReaction(0)
         mz = reaction.PrecursorMass
@@ -157,6 +171,7 @@ class ThermoImporter(Importer):
         return mz, width
 
     def get_cdms_data(self, scan_range=None):
+        """Return centroid peaks as injection-corrected five-column CD-MS events."""
         raw_dat = self.get_all_centroid_scans(threshold=0)
         scans = self.scans
 
@@ -183,6 +198,7 @@ class ThermoImporter(Importer):
         return data_array
 
     def close(self):
+        """Close the Thermo RawFileReader handle."""
         self.msrun.Close()
         return
 

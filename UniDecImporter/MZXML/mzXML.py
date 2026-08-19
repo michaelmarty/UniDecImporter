@@ -1,3 +1,5 @@
+"""Open-format mzXML reader built on pyteomics."""
+
 from copy import deepcopy
 import numpy as np
 from .. import tools as ud
@@ -10,6 +12,7 @@ from ..ImportTools import get_resolution
 
 
 def get_data_from_spectrum(spectrum, threshold=-1):
+    """Convert a pyteomics spectrum to a filtered m/z-intensity array."""
     impdat = np.transpose([spectrum['m/z array'], spectrum['intensity array']])
     impdat = impdat[impdat[:, 0] > 10]
     if threshold >= 0:
@@ -42,6 +45,7 @@ class MZXMLImporter(Importer):
         self.chrom_support = True
 
     def init_scans(self):
+        """Read scan identifiers, retention times, and MS levels from the file."""
         self.times = []
         self.scans = []
         self.levels = []
@@ -64,6 +68,7 @@ class MZXMLImporter(Importer):
         self.scan_range = [np.amin(self.scans), np.amax(self.scans)]
 
     def get_single_scan(self, scan):
+        """Return one mzXML scan as an m/z-intensity array."""
         # Iterate until we hit the desired scan, then return it, and reset the iterator
         # self.msrun.reset()
         # s = 0
@@ -80,6 +85,7 @@ class MZXMLImporter(Importer):
         return dat
 
     def avg_safe(self, scan_range=None, time_range=None):
+        """Stream and merge selected scans without caching the complete run."""
         scan_range = self.scan_range_from_inputs(scan_range, time_range)
 
         self.msrun.reset()
@@ -114,6 +120,7 @@ class MZXMLImporter(Importer):
         return template
 
     def get_all_scans(self, threshold=-1):
+        """Load all readable scans, optionally filtering by intensity."""
         newtimes = []
         newids = []
         self.data = []
@@ -144,6 +151,7 @@ class MZXMLImporter(Importer):
         return data
 
     def get_tic(self):
+        """Return the total-ion chromatogram as retention-time/intensity rows."""
         tic = []
         print("Constructing TIC")
         self.msrun.reset()
@@ -159,6 +167,7 @@ class MZXMLImporter(Importer):
         return ticdat
 
     def get_polarity(self, scan=None):
+        """Read and return the polarity declared by the first mzXML scan."""
         tree = ET.parse(self._file_path)
         root = tree.getroot()
         polarity = None
@@ -177,12 +186,14 @@ class MZXMLImporter(Importer):
             return None
 
     def get_ms_order(self, scan=1):
+        """Return the recorded MS level for *scan*."""
         index = self.get_scan_index(scan)
         ms_order = self.levels[index]
         return ms_order
 
 
     def close(self):
+        """Close the pyteomics mzXML reader."""
         self.msrun.close()
 
 

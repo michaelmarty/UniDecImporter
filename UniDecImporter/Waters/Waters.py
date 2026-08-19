@@ -1,3 +1,5 @@
+"""High-level Waters MassLynx RAW importer."""
+
 import numpy as np
 from .. import tools as ud
 from ..Importer import Importer
@@ -14,6 +16,7 @@ class WatersDataImporter(Importer):
     Note: Waters scans are 0 indexed, so the first scan is scan 0, not scan 1.
     """
     def __init__(self, path, function=0, *args, **kwargs):
+        """Open a Waters RAW directory and select a MassLynx function."""
         super().__init__(path, **kwargs)
         print("Reading Waters Data:", path)
         self.function = int(function)
@@ -27,6 +30,7 @@ class WatersDataImporter(Importer):
 
 
     def init_scans(self):
+        """Validate the selected function and load its scan metadata."""
         self.nfunc = self.reader.GetNumberofFunctions()
         try:
             fn = self.reader.GetFunctionType(self.function)
@@ -55,12 +59,14 @@ class WatersDataImporter(Importer):
         self.times = np.array(self.times)
 
     def get_stats(self):
+        """Load the available MassLynx scan-statistic names and values."""
         self.reader = MLRIR.MassLynxRawInfoReader(self._file_path)
         self.stat_nums = self.reader.GetItemsInFunction(self.function, 0)
         self.stat_vals = self.reader.GetScanItems(self.function, 0, self.stat_nums)
         self.stat_names = self.reader.GetScanItemString(self.stat_nums)
 
     def get_stat_code(self, stat_code):
+        """Return a scan-statistic value selected by numeric code."""
         self.get_stats()
         if stat_code in self.stat_nums:
             index = ud.nearestunsorted(self.stat_nums, stat_code)
@@ -72,6 +78,7 @@ class WatersDataImporter(Importer):
         return value
 
     def get_stat_name(self, stat_name):
+        """Return a scan-statistic value selected by case-insensitive name."""
         self.get_stats()
         for i, sn in enumerate(self.stat_names):
             if sn.lower() == stat_name.lower():
@@ -82,6 +89,7 @@ class WatersDataImporter(Importer):
         return 0
 
     def get_avg_scan(self, scan_range=None, time_range=None, mzbins=None):
+        """Combine selected scans, optionally using a fixed m/z bin width."""
         scan_range = self.scan_range_from_inputs(scan_range, time_range)
 
         mzs, ivals = self.readerMS.combineScan(self.function, np.arange(scan_range[0]-1, scan_range[1]))
@@ -93,6 +101,7 @@ class WatersDataImporter(Importer):
             return data
 
     def get_all_scans(self):
+        """Load every spectrum for the selected MassLynx function."""
         self.data = []
         for s in self.scans:
             impdat = np.transpose(self.readerMS.ReadScan(self.function, s-1))
@@ -101,6 +110,7 @@ class WatersDataImporter(Importer):
         return self.data
 
     def get_single_scan(self, scan):
+        """Return one scan as an m/z-intensity array."""
         #This should return a format which is similar to the numpy 2 column format
         dat = self.readerMS.ReadScan(self.function, scan-1)
         mz, intensity = dat
@@ -108,18 +118,21 @@ class WatersDataImporter(Importer):
         return res
 
     def get_tic(self):
+        """Return the total-ion chromatogram."""
         self.readerLC = MLCR.MassLynxRawChromatogramReader(self._file_path)
         tic = np.transpose(self.readerLC.ReadTIC(self.function))
         # self.readerLC.__del__()
         return tic
 
     def get_bpi(self):
+        """Return the base-peak intensity chromatogram."""
         self.readerLC = MLCR.MassLynxRawChromatogramReader(self._file_path)
         tic = np.transpose(self.readerLC.ReadBPI(self.function))
         return tic
 
 
     def get_all_imms_scans(self):
+        """Load ion-mobility data for every scan."""
         # self.mindrift = self.get_stat_name('Minimum Drift Time Channel')
         # self.maxdrift = self.get_stat_name('Maximum Drift Time Channel')
         self.trf = self.get_stat_name("Transport RF")
@@ -131,6 +144,7 @@ class WatersDataImporter(Importer):
         return self.immsdata
 
     def get_imms_scan(self, s):
+        """Return one scan as m/z, drift-bin, and intensity rows."""
         scandat = []
         for i in range(0, 200):
             o = self.readerMS.ReadDriftScan(self.function, s - 1, i)
@@ -142,6 +156,7 @@ class WatersDataImporter(Importer):
         return np.array(scandat)
 
     def get_polarity(self, scan=None):
+        """Return the polarity of the selected MassLynx function."""
         line = self.reader.GetIonModeString(self.function)
         if "+" in line:
             print("Polarity: Positive")
@@ -153,11 +168,13 @@ class WatersDataImporter(Importer):
         return None
 
     def get_ms_order(self, scan=None):
+        """Infer the MS level from the selected function type."""
         ms_level =  self.reader.GetFunctionTypeString(self.function)
         count = ms_level.count("MS")
         return count
 
     def close(self):
+        """Release the MassLynx reader objects."""
         del self.reader
         del self.readerMS
 

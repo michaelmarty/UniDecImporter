@@ -1,3 +1,5 @@
+"""Spectrum merging, text-header detection, and chromatogram indexing helpers."""
+
 import re
 import numpy as np
 from collections import defaultdict
@@ -75,10 +77,12 @@ def get_resolution(testdata):
 
 
 def fit_line(x, a, b):
+    """Evaluate the power-law function ``a * x**b``."""
     return a * x ** b
 
 
 def get_longest_index(datalist):
+    """Return the index of the spectrum containing the most rows."""
     if len(datalist) == 0:
         raise ValueError("datalist must contain at least one spectrum")
     lengths = [len(x) for x in datalist]
@@ -154,11 +158,7 @@ def merge_spectra(datalist, mzbins=None, type="Integrate"):
     return template
 
 def get_resolution_im(data):
-    """
-    Get the median resolution of 1D MS data.
-    :param testdata: N x 2 data (mz, intensity)
-    :return: Median resolution (float)
-    """
+    """Estimate median m/z resolving power from nonzero ion-mobility points."""
     testdata = deepcopy(data)
     testdata = testdata[testdata[:, 2] > 0]
     diffs = np.transpose([testdata[1:, 0], np.diff(testdata[:, 0])])
@@ -264,6 +264,7 @@ def nonlinear_axis(start, end, res):
 #     return data
 
 def compute_bin_indices(mzs, intensities, min_mz, bin_width):
+    """Map m/z values to integer bins and return the values with their indices."""
     if bin_width <= 0:
         raise ValueError("bin_width must be positive")
     indices = ((mzs - min_mz) / bin_width).astype(np.int32)
@@ -274,6 +275,7 @@ class IndexedScan:
     A class to store an in individual scan with the peaks indexed into bins by m/z.
     """
     def __init__(self, scan, rt, scan_num, min_mz, bin_width):
+        """Index one spectrum using an m/z origin and bin width."""
         self.scan = scan
         self.retention_time = rt
         self.scan_num = scan_num
@@ -283,6 +285,7 @@ class IndexedScan:
 
 
     def index_peaks(self, min_mz, bin_width):
+        """Group this scan's peaks into m/z bins."""
         mzs = np.array(self.scan[:,0])
         intensities = np.array(self.scan[:,1])
         indices, mzs, intensities = compute_bin_indices(mzs, intensities, min_mz, bin_width)
@@ -361,6 +364,7 @@ class IndexedFile:
     A class to store a set of indexed scans originating from a single mzML file.
     """
     def __init__(self):
+        """Initialize an empty collection of indexed scans."""
         self.min_mz = 0
         self.bin_width = 1
         self.indexed_scans = []

@@ -1,3 +1,5 @@
+"""Open-format mzML reader built on pymzML."""
+
 import time
 import numpy as np
 import os
@@ -28,12 +30,14 @@ def gzip_files(mzml_path, out_path):
 
 
 def auto_gzip(mzml_path):
+    """Create an indexed gzip copy of *mzml_path* and return its path."""
     out_path = mzml_path + ".gz"
     gzip_files(mzml_path, out_path)
     return out_path
 
 
 def get_data_from_spectrum(spectrum, threshold=-1, check_duplicates=False):
+    """Convert a pymzML spectrum to a filtered m/z-intensity array."""
     if spectrum == None:
         return
     impdat = np.transpose([spectrum.mz, spectrum.i])
@@ -56,6 +60,7 @@ def get_data_from_spectrum(spectrum, threshold=-1, check_duplicates=False):
 
 
 def get_im_data_from_spectrum(spectrum, threshold=-1):
+    """Convert a spectrum to filtered m/z, drift-time, and intensity rows."""
     array_params = spectrum._get_encoding_parameters("raw ion mobility array")
     dtarray = spectrum._decode(*array_params)
 
@@ -68,6 +73,7 @@ def get_im_data_from_spectrum(spectrum, threshold=-1):
 
 
 def get_inj_time(spectrum):
+    """Return a spectrum's ion injection time, or one when unavailable."""
     element = spectrum.element
     it = 1
     for child in element.iter():
@@ -82,6 +88,7 @@ def get_inj_time(spectrum):
 
 
 def search_by_id(obo, id):
+    """Return selected descriptive fields for an accession in an OBO lookup."""
     key = "MS:{0}".format(id)
     return_value = ""
     for lookup in obo.lookups:
@@ -133,6 +140,7 @@ class MZMLImporter(Importer):
     Note: Some mzML files are 1 indexed, so the first scan is 1, not 0. Others are not, which is frustrating...
     """
     def __init__(self, path, *args, **kwargs):
+        """Open an mzML file and initialize its scan metadata."""
         super().__init__(path, **kwargs)
 
         self._reader_path = path
@@ -146,6 +154,7 @@ class MZMLImporter(Importer):
         print("Reading mzML file:", path)
 
     def init_scans(self):
+        """Index valid spectrum identifiers, retention times, and MS levels."""
         get_time = lambda s: s.scan_time_in_minutes()
 
         times, scans, levels = [], [], []
@@ -193,6 +202,7 @@ class MZMLImporter(Importer):
         self.reset_reader()
 
     def get_single_scan(self, scan):
+        """Return one mzML scan as an m/z-intensity array."""
         try:
             data = get_data_from_spectrum(self._get_spectrum(scan))
         except Exception as e:
@@ -219,6 +229,7 @@ class MZMLImporter(Importer):
 
     #This is the merging function
     def avg_safe(self, scan_range=None, time_range=None):
+        """Stream and merge selected scans without caching the complete run."""
         scan_range = self.scan_range_from_inputs(scan_range, time_range)
 
         self.reset_reader()
@@ -251,10 +262,12 @@ class MZMLImporter(Importer):
         return template
 
     def reset_reader(self):
+        """Reopen the pymzML reader at the beginning of the source."""
         self.msrun.close()
         self.msrun = pymzml.run.Reader(self._reader_path)
 
     def get_all_scans(self, threshold=-1):
+        """Load all readable spectra, optionally filtering by intensity."""
         self.reset_reader()
         newtimes = []
         newids = []
@@ -288,6 +301,7 @@ class MZMLImporter(Importer):
         return data
 
     def get_tic(self):
+        """Return the total-ion chromatogram as retention-time/intensity rows."""
         try:
             tic = self.msrun["TIC"]
             ticdat = np.transpose([tic.time, tic.i])
@@ -314,6 +328,7 @@ class MZMLImporter(Importer):
         return ticdat
 
     def get_property(self, s, name):
+        """Return a named XML property from scan *s*."""
         element = self._get_spectrum(s).element
         it = 1
         for child in element.iter():
@@ -327,6 +342,7 @@ class MZMLImporter(Importer):
         return it
 
     def get_inj_time_array(self):
+        """Return ion injection times aligned with the current scan list."""
         self.reset_reader()
         its = []
         scan_ids = {str(scan) for scan in self.scans}
@@ -344,6 +360,7 @@ class MZMLImporter(Importer):
         return np.array(its)
 
     def get_all_imms_scans(self):
+        """Load all spectra containing ion-mobility peak data."""
         self.reset_reader()
         newtimes = []
         newids = []
@@ -365,6 +382,7 @@ class MZMLImporter(Importer):
 
     # grab pol info from single scan. Similar to old impl but use direct idxing
     def get_polarity(self, scan=1):
+        """Inspect one scan and return its positive or negative polarity."""
         if scan == -1:
             scan = self.scans[0]
         # Directly access the scan at the provided index
@@ -400,6 +418,7 @@ class MZMLImporter(Importer):
 
 
     def get_isolation_mz_width(self, s):
+        """Return precursor isolation m/z and the nominal isolation width."""
         scan = self._get_spectrum(s)
         precursors = scan.selected_precursors
         if len(precursors) == 0:
@@ -411,6 +430,7 @@ class MZMLImporter(Importer):
             return mz, width
 
     def get_cdms_data(self, scan_range=None):
+        """Return peaks as five-column CD-MS events with injection correction."""
         raw_dat = self.get_all_scans(threshold=0)
 
         it = 1. / self.get_inj_time_array()
@@ -438,6 +458,7 @@ class MZMLImporter(Importer):
 
 
     def close(self):
+        """Close the pymzML reader."""
         self.msrun.close()
 
 if __name__ == "__main__":

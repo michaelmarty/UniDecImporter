@@ -1,3 +1,5 @@
+"""Batch exporters for time- and scan-sliced mass-spectrometry datasets."""
+
 __author__ = 'Michael.Marty'
 
 import numpy as np
@@ -11,6 +13,11 @@ from . import tools as ud
 
 
 def parse(path, times, timestep, volts, outputheader, directory, output="txt"):
+    """Average consecutive time windows from one source and export TXT or HDF5.
+
+    ``times`` contains window start times and ``timestep`` is the width in minutes.
+    Optional ``volts`` values are recorded as collision-voltage metadata.
+    """
     if output not in {"txt", "hdf5"}:
         raise ValueError("output must be 'txt' or 'hdf5'")
     if os.path.isfile(path) or os.path.isdir(path):
@@ -66,6 +73,7 @@ def parse(path, times, timestep, volts, outputheader, directory, output="txt"):
 
 
 def parse_multiple(paths, timestep, newdir, starttp, endtp, voltsarr=None, outputname=None):
+    """Export matching time windows from multiple inputs into one HDF5 dataset."""
     outfile = outputname + ".hdf5"
     outpath = os.path.join(newdir, outfile)
     hdf = h5py.File(outpath, "a")
@@ -117,6 +125,7 @@ def parse_multiple(paths, timestep, newdir, starttp, endtp, voltsarr=None, outpu
 
 
 def extract(file, directory, timestep=1.0, output="txt"):
+    """Slice one file by retention time, recognizing optional ramp metadata in its name."""
     print(file)
     path = os.path.join(directory, file)
     name = os.path.splitext(file)[0]
@@ -148,6 +157,7 @@ def extract(file, directory, timestep=1.0, output="txt"):
 
 
 def extract_scans(file, directory, scanbins=1, output="txt"):
+    """Average one file in consecutive scan windows and export TXT or HDF5."""
     print(file)
     scanbins = int(float(scanbins))
     path = os.path.join(directory, file)
@@ -213,6 +223,7 @@ def extract_scans(file, directory, scanbins=1, output="txt"):
 
 
 def extract_timepoints(files, directories, starttp=None, endtp=None, timestep=1.0, outputname="Combined"):
+    """Combine time windows from several files, including filename-encoded ramps."""
     paths = []
     names = []
     newdir = 0
@@ -245,6 +256,7 @@ def extract_timepoints(files, directories, starttp=None, endtp=None, timestep=1.
 
 def extract_scans_multiple_files(files, dirs, startscan=1.0, endscan=1.0, outputname="Combined", existing_path=None,
                                  vars=None, keys=None):
+    """Average a scan range from each input and write one combined HDF5 dataset."""
     paths = []
     names = []
     startscan = int(float(startscan))
@@ -307,6 +319,7 @@ def extract_scans_multiple_files(files, dirs, startscan=1.0, endscan=1.0, output
 
 
 def get_files(directory, timestep=1.0, output="txt"):
+    """Export time windows from every mzML file directly within *directory*."""
     for file in os.listdir(directory):
         if fnmatch.fnmatch(file.lower(), '*.mzml'):
             extract(file, directory, timestep=timestep, output=output)
