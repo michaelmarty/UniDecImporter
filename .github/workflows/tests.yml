@@ -37,13 +37,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - run: python -m pip install ".[test]"
-      - run: python -m pytest -m "not integration and not vendor" --cov=UniDecImporter --cov-report=xml
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: coverage-${{ matrix.os }}-${{ matrix.python-version }}
-          path: coverage.xml
-          if-no-files-found: ignore
+      - run: python -m pytest -m "not integration and not vendor"
 
   open-format-integration:
     name: Open formats / ${{ matrix.os }}
@@ -62,7 +56,36 @@ jobs:
           cache: pip
       - run: git lfs pull
       - run: python -m pip install ".[test]"
-      - run: python -m pytest -m "integration and not vendor"
+      - name: Run all open-format tests with coverage
+        if: runner.os == 'Linux'
+        run: >-
+          python -m pytest -m "not vendor"
+          --cov=UniDecImporter --cov-report=term-missing --cov-report=xml
+      - name: Run open-format integration tests
+        if: runner.os != 'Linux'
+        run: python -m pytest -m "integration and not vendor"
+      - uses: actions/upload-artifact@v7
+        if: runner.os == 'Linux'
+        with:
+          name: coverage-open-formats
+          path: coverage.xml
+          if-no-files-found: error
+
+  thermo-integration:
+    name: Thermo RAW / Windows x86-64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          architecture: x64
+          cache: pip
+      - run: git lfs pull
+      - run: python -m pip install ".[test,thermo]"
+      - run: python -m pytest tests/test_vendor_formats.py -m "vendor and integration" -k "thermo_"
 
   installed-wheel:
     name: Installed wheel smoke test
@@ -81,4 +104,3 @@ jobs:
         run: |
           printf "100 2\n101 3\n" > spectrum.txt
           wheel-test/bin/python -c "from UniDecImporter import get_importer; d=get_importer('spectrum.txt'); assert d.get_avg_scan().shape == (2, 2)"
-

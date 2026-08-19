@@ -8,3 +8,5 @@ TestData/**/*.DAT filter=lfs diff=lfs merge=lfs -text
 TestData/**/*.IDX filter=lfs diff=lfs merge=lfs -text
 TestData/**/*.cdt filter=lfs diff=lfs merge=lfs -text
 TestData/**/*.ind filter=lfs diff=lfs merge=lfs -text
+TestData/**/*.txt filter=lfs diff=lfs merge=lfs -text
+TestData/**/*.csv filter=lfs diff=lfs merge=lfs -text
