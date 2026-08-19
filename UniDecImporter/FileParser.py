@@ -5,11 +5,17 @@ __author__ = 'Michael.Marty'
 import numpy as np
 
 from .ImporterFactory import ImporterFactory
-from .hdf5_tools import replace_dataset
 import os
 import fnmatch
 import h5py
-from . import tools as ud
+from . import ImportTools as ud
+
+
+def replace_dataset(group, name, data):
+    """Replace *name* in an h5py group and return the new dataset."""
+    if name in group:
+        del group[name]
+    return group.create_dataset(name, data=data)
 
 
 def parse(path, times, timestep, volts, outputheader, directory, output="txt"):

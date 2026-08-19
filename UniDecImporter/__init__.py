@@ -1,8 +1,14 @@
 """Standalone readers for mass-spectrometry data."""
 
+from . import ImportTools as tools
 from ._version import __version__
-from .exceptions import UnsupportedFormatError, VendorReaderUnavailableError
-from .ImporterFactory import ImporterFactory, get_polarity, recognized_types
+from .ImporterFactory import (
+    ImporterFactory,
+    UnsupportedFormatError,
+    VendorReaderUnavailableError,
+    get_polarity,
+    recognized_types,
+)
 
 def get_importer(file_path, **kwargs):
     """Return the format-specific reader selected for *file_path*."""
@@ -17,5 +23,6 @@ __all__ = [
     "get_importer",
     "get_polarity",
     "recognized_types",
+    "tools",
 ]
 

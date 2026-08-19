@@ -10,7 +10,18 @@ from . import SingleScanImporter as SSI
 from .I2MS.I2MS import I2MSImporter
 from .MZML.mzML import MZMLImporter
 from .MZXML.mzXML import MZXMLImporter
-from .exceptions import UnsupportedFormatError, VendorReaderUnavailableError
+
+
+class UniDecImporterError(Exception):
+    """Base error for this package."""
+
+
+class UnsupportedFormatError(UniDecImporterError, OSError):
+    """Raised when no reader is registered for a path."""
+
+
+class VendorReaderUnavailableError(UniDecImporterError):
+    """Raised when a vendor reader cannot run on the current platform."""
 
 
 OPEN_FORMATS = (".mzxml", ".mzml", ".mzml.gz", ".gz", ".txt", ".dat", ".csv",

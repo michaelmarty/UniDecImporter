@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from UniDecImporter import get_importer
-from UniDecImporter.exceptions import VendorReaderUnavailableError
+from UniDecImporter.ImporterFactory import VendorReaderUnavailableError
 
 
 WINDOWS_X64 = platform.system() == "Windows" and platform.machine().lower() in {"amd64", "x86_64", "x64"}

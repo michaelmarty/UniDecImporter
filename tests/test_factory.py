@@ -10,7 +10,7 @@ from UniDecImporter.I2MS.I2MS import I2MSImporter
 from UniDecImporter.MZML.mzML import MZMLImporter
 from UniDecImporter.MZXML.mzXML import MZXMLImporter
 from UniDecImporter.SingleScanImporter import SingleScanImporter
-from UniDecImporter.exceptions import UnsupportedFormatError, VendorReaderUnavailableError
+from UniDecImporter.ImporterFactory import UnsupportedFormatError, VendorReaderUnavailableError
 
 
 def test_public_api_and_factory_instance():

@@ -4,7 +4,7 @@ import time
 import numpy as np
 import os
 from copy import deepcopy
-from .. import tools as ud
+from .. import ImportTools as ud
 import pymzml
 from pymzml.utils.utils import index_gzip
 import pymzml.obo

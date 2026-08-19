@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 import numpy as np
-from .. import tools as ud
+from .. import ImportTools as ud
 import xml.etree.ElementTree as ET
 import time
 from pyteomics import mzxml

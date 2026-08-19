@@ -1,11 +1,121 @@
-"""Spectrum merging, text-header detection, and chromatogram indexing helpers."""
+"""Numerical, spectrum-merging, text-header, and chromatogram helpers."""
+
+from __future__ import annotations
 
 import re
 import numpy as np
 from collections import defaultdict
-from . import tools as ud
 from copy import deepcopy
 import math
+
+
+def isempty(value) -> bool:
+    """Return ``True`` when *value* is ``None`` or has no elements."""
+    return value is None or np.asarray(value, dtype=object).size == 0
+
+
+def safedivide(numerator, denominator):
+    """Divide arrays while returning zero where the denominator is zero."""
+    numerator = np.asarray(numerator)
+    denominator = np.asarray(denominator)
+    shape = np.broadcast_shapes(numerator.shape, denominator.shape)
+    result = np.zeros(shape, dtype=np.result_type(numerator, denominator, float))
+    return np.divide(numerator, denominator, out=result, where=denominator != 0)
+
+
+def nearestunsorted(values, target) -> int:
+    """Return the index of the value nearest to *target*."""
+    return int(np.argmin(np.abs(np.asarray(values) - target)))
+
+
+def nonlinear_axis(start: float, end: float, resolution) -> np.ndarray:
+    """Create an m/z axis with constant or power-law resolving power.
+
+    ``resolution`` may be a scalar or an ``(a, b)`` pair defining
+    ``a * m/z**b``.
+    """
+    start, end = float(start), float(end)
+    coefficients = np.asarray(resolution, dtype=float)
+    if coefficients.ndim == 0:
+        a, b = float(coefficients), 0.0
+    elif coefficients.shape == (2,):
+        a, b = map(float, coefficients)
+    else:
+        raise ValueError("resolution must be a scalar or an (a, b) pair")
+    if start <= 0 or end < start:
+        raise ValueError("start must be positive and end must be >= start")
+
+    values = [start]
+    current = start
+    while True:
+        resolving_power = fit_line(current, a, b)
+        if not np.isfinite(resolving_power) or resolving_power <= 0:
+            raise ValueError("resolution must remain positive and finite")
+        current += current / resolving_power
+        if current >= end:
+            break
+        values.append(current)
+    return np.asarray(values)
+
+
+def mergedata(template: np.ndarray, data: np.ndarray) -> np.ndarray:
+    """Interpolate two-column *data* onto a two-column template axis."""
+    template = np.asarray(template)
+    data = np.asarray(data)
+    if template.ndim != 2 or template.shape[1] < 1:
+        raise ValueError("template must be an N x 2 array")
+    if data.ndim != 2 or data.shape[1] < 2:
+        raise ValueError("data must be an N x 2 array")
+    order = np.argsort(data[:, 0])
+    intensities = np.interp(template[:, 0], data[order, 0], data[order, 1], left=0, right=0)
+    return np.column_stack((template[:, 0], intensities))
+
+
+def lintegrate(data: np.ndarray, axis: np.ndarray, fastmode: bool = False) -> np.ndarray:
+    """Conservatively bin intensities from two-column *data* onto *axis*."""
+    del fastmode
+    data = np.asarray(data)
+    axis = np.asarray(axis)
+    if axis.ndim != 1 or axis.size == 0:
+        raise ValueError("axis must be a non-empty one-dimensional array")
+    if data.ndim != 2 or data.shape[1] < 2:
+        raise ValueError("data must be an N x 2 array")
+    if axis.size == 1:
+        return np.column_stack((axis, [np.sum(data[:, 1])]))
+    midpoints = axis[:-1] + np.diff(axis) / 2
+    first = axis[0] - (midpoints[0] - axis[0])
+    last = axis[-1] + (axis[-1] - midpoints[-1])
+    edges = np.concatenate(([first], midpoints, [last]))
+    intensity, _ = np.histogram(data[:, 0], bins=edges, weights=data[:, 1])
+    return np.column_stack((axis, intensity))
+
+
+def get_autocorr_ratio(data: np.ndarray) -> float:
+    """Return the lag-one/lag-zero intensity autocorrelation ratio."""
+    intensities = np.asarray(data, dtype=float)[:, 1]
+    if intensities.size < 2:
+        return 0.0
+    denominator = float(np.dot(intensities, intensities))
+    if denominator == 0:
+        return 0.0
+    return float(np.dot(intensities[:-1], intensities[1:]) / denominator)
+
+
+def data_extract(data: np.ndarray, mz: float, method: int, window: float | None = None):
+    """Extract a peak height (method 1) or its m/z position (method 4)."""
+    data = np.asarray(data)
+    if data.ndim != 2 or data.shape[1] < 2 or len(data) == 0:
+        return 0
+    candidates = (np.arange(len(data)) if window is None else
+                  np.flatnonzero(np.abs(data[:, 0] - mz) <= window))
+    if candidates.size == 0:
+        return 0
+    peak_index = candidates[np.argmax(data[candidates, 1])]
+    if method == 1:
+        return data[peak_index, 1]
+    if method == 4:
+        return data[peak_index, 0]
+    raise ValueError(f"unsupported extraction method: {method}")
 
 def header_test(path, deletechars=None, delimiter=" |\t|,", strip_end_space=True):
     """
@@ -72,7 +182,7 @@ def get_resolution(testdata):
     if testdata.ndim != 2 or testdata.shape[1] < 2 or len(testdata) < 2:
         raise ValueError("at least two m/z-intensity rows are required")
     diffs = np.transpose([testdata[1:, 0], np.diff(testdata[:, 0])])
-    resolutions = ud.safedivide(diffs[:, 0], diffs[:, 1])
+    resolutions = safedivide(diffs[:, 0], diffs[:, 1])
     return np.median(resolutions)
 
 
@@ -125,7 +235,7 @@ def merge_spectra(datalist, mzbins=None, type="Integrate"):
             print("ERROR, resolution is 0, using 20000.", maxlenpos, datalist[maxlenpos])
             resolution = 20000
 
-        axis = ud.nonlinear_axis(np.amin(concat[:, 0]), np.amax(concat[:, 0]), resolution)
+        axis = nonlinear_axis(np.amin(concat[:, 0]), np.amax(concat[:, 0]), resolution)
     else:
         if float(mzbins) < 0:
             raise ValueError("mzbins must be non-negative")
@@ -140,9 +250,9 @@ def merge_spectra(datalist, mzbins=None, type="Integrate"):
     for d in datalist:
         if len(d) > 2:
             if type == "Interpolate":
-                newdat = ud.mergedata(template, d)
+                newdat = mergedata(template, d)
             elif type == "Integrate":
-                newdat = ud.lintegrate(d, axis, fastmode=True)
+                newdat = lintegrate(d, axis, fastmode=True)
             else:
                 print("ERROR: unrecognized merge spectra type:", type)
                 continue
@@ -164,7 +274,7 @@ def get_resolution_im(data):
     diffs = np.transpose([testdata[1:, 0], np.diff(testdata[:, 0])])
     b1 = diffs[:,1] > 0
     diffs = diffs[b1]
-    resolutions = ud.safedivide(diffs[:, 0], diffs[:, 1])
+    resolutions = safedivide(diffs[:, 0], diffs[:, 1])
     return np.median(resolutions)
 
 def merge_im_spectra(datalist, mzbins=None, type="Integrate"):
@@ -192,7 +302,7 @@ def merge_im_spectra(datalist, mzbins=None, type="Integrate"):
     # Otherwise, create a dummy axis with the specified m/z bin size.
     if mzbins is None or float(mzbins) == 0:
         resolution = get_resolution_im(datalist[maxlenpos])
-        mzaxis = ud.nonlinear_axis(np.amin(concat[:, 0]), np.amax(concat[:, 0]), resolution)
+        mzaxis = nonlinear_axis(np.amin(concat[:, 0]), np.amax(concat[:, 0]), resolution)
     else:
         if float(mzbins) < 0:
             raise ValueError("mzbins must be non-negative")
@@ -236,23 +346,6 @@ def merge_im_spectra(datalist, mzbins=None, type="Integrate"):
             template[:, 2] += np.ravel(newdat)
     return template
 
-
-def nonlinear_axis(start, end, res):
-    """
-    Creates a nonlinear axis with the m/z values spaced with a defined and constant resolution.
-    :param start: Minimum m/z value
-    :param end: Maximum m/z value
-    :param res: Resolution of the axis ( m / delta m)
-    :return: One dimensional array of the nonlinear axis.
-    """
-    axis = []
-    i = start
-    axis.append(i)
-    i += i / fit_line(i, res[0], res[1])
-    while i < end:
-        axis.append(i)
-        i += i / fit_line(i, res[0], res[1])
-    return np.array(axis)
 
 #
 # def waters_convert2(path, config=None, outfile=None, time_range=None):

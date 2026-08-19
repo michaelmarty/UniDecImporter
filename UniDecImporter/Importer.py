@@ -3,7 +3,7 @@
 import time
 import os
 import numpy as np
-from . import tools as ud
+from . import ImportTools as ud
 from copy import deepcopy
 from .ImportTools import merge_spectra, merge_im_spectra, IndexedFile, IndexedScan
 class Importer:

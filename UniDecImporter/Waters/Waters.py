@@ -1,7 +1,7 @@
 """High-level Waters MassLynx RAW importer."""
 
 import numpy as np
-from .. import tools as ud
+from .. import ImportTools as ud
 from ..Importer import Importer
 from ..ImportTools import merge_spectra
 from . import MassLynxRawScanReader as MLRSR, MassLynxRawInfoReader as MLRIR, \

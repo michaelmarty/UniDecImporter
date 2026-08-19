@@ -114,4 +114,3 @@ def test_indexed_scan_and_file():
     assert indexed.get_indexed_spectrum_atRt(3.8).scan_num == 8
     with pytest.raises(LookupError):
         IndexedFile().get_indexed_spectrum_atRt(1)
-
