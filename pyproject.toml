@@ -30,7 +30,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Chemistry",
 ]
 dependencies = [
-    "h5py>=3.8",
     "numpy>=1.23",
     "pymzml>=2.5",
     "pyteomics[XML]>=4.6",

@@ -73,9 +73,3 @@ Check `cdms_support` or `imms_support` first. Unsupported operations raise
 normally use the factory. `close()` releases resources. `__enter__()` returns the reader and
 `__exit__()` closes it without suppressing exceptions, so all readers support `with`.
 
-## FileParser
-
-`UniDecImporter.FileParser` contains batch slicing helpers for writing averaged time or
-scan windows to text or UniDec-compatible HDF5 datasets: `parse`, `parse_multiple`,
-`extract`, `extract_scans`, `extract_timepoints`, and `extract_scans_multiple_files`.
-

@@ -7,7 +7,7 @@ authors:
     given-names: Michael T.
     email: mtmarty@utexas.edu
 abstract: Standalone readers for open and vendor mass-spectrometry data formats.
-version: "0.1.0"
+version: "1.0.0"
 repository-code: "https://github.com/michaelmarty/UniDecImporter"
 url: "https://michaelmarty.github.io/UniDecImporter/"
 license: BSD-3-Clause
@@ -17,4 +17,3 @@ keywords:
   - mzXML
   - charge detection mass spectrometry
   - ion mobility
-

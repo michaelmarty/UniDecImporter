@@ -43,5 +43,5 @@ and license them directly from Agilent, then set `AGILENT_DA_SDK_DIR` to their d
 
 ## Open-format dependencies
 
-NumPy, h5py, pymzML, and pyteomics are installed as dependencies. Pythonnet is an
+NumPy, pymzML, and pyteomics are installed as dependencies. Pythonnet is an
 optional Thermo/Agilent/vendor dependency. Each remains governed by its respective license.
