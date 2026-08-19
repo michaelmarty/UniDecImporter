@@ -27,8 +27,17 @@ python -m pip install "mass-spec-importer[thermo]"
 ```
 
 Python 3.10–3.13 is supported on Windows, macOS, and Linux. Open formats work on all
-three operating systems. The distributed package is pure Python; its open-format
-dependencies provide normal platform wheels.
+three operating systems. The package includes Windows-only Thermo .NET assemblies as
+data files, but importing and using open-format readers does not load them.
+
+> **Thermo proprietary software:** Installing or using the bundled Thermo RawFileReader
+> assemblies means you accept Thermo's separate license, included in the distribution.
+> End users may not redistribute those assemblies. Commercial exploitation requires
+> Thermo's prior written consent. The BSD license covers this project's Python code, not
+> the Thermo binaries. See [`THERMO_RAWFILEREADER_TERMS.md`](THERMO_RAWFILEREADER_TERMS.md).
+>
+> RawFileReader reading tool. Copyright © 2016 by Thermo Fisher Scientific, Inc. All
+> rights reserved.
 
 ## Format support
 
@@ -43,12 +52,13 @@ dependencies provide normal platform wheels.
 | Waters RAW directory | LC-MS, IM-MS | Windows x86-64 only | Waters MassLynx SDK |
 | Agilent `.d` | LC-MS, MS/MS | Windows x86-64 only | Agilent MassHunter Data Access SDK + pythonnet |
 
-Vendor SDK licenses prevent their binaries from being redistributed in the wheel or
-source distribution. A local source checkout can use already-present licensed binaries.
-For an installed package, set `THERMO_RAW_FILE_READER_DIR` to a licensed Thermo assembly
-directory, `MASSLYNX_RAW_DLL` to a licensed Waters DLL, or `AGILENT_DA_SDK_DIR` to a
-licensed Agilent Data Access assembly directory. Unsupported platforms and missing
-runtimes raise `VendorReaderUnavailableError` with an actionable message.
+The four Thermo RawFileReader assemblies are bundled under their separate proprietary
+terms. Waters and Agilent SDK licenses do not permit this project to redistribute those
+binaries, so users must obtain them separately. Set `THERMO_RAW_FILE_READER_DIR` to
+override the bundled Thermo assembly directory, `MASSLYNX_RAW_DLL` to a licensed Waters
+DLL, or `AGILENT_DA_SDK_DIR` to a licensed Agilent Data Access assembly directory.
+Unsupported platforms and missing runtimes raise `VendorReaderUnavailableError` with an
+actionable message.
 
 ## Core API
 

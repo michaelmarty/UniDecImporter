@@ -18,9 +18,10 @@ without loading any vendor runtime.
 Thermo RAW and Waters RAW require 64-bit x86 Windows. The factory distinguishes a Thermo
 RAW file from a Waters RAW directory.
 
-Vendor binaries are not redistributed because their licenses impose restrictions that
-are incompatible with an unrestricted open-source wheel. Obtain and install the SDK from
-the vendor, then configure:
+The Windows-only Thermo RawFileReader assemblies are bundled as data files under their
+separate proprietary license. Waters and Agilent binaries are not redistributed; obtain
+and license those SDKs from their vendors. The following variables override the bundled
+Thermo location or configure a locally installed vendor SDK:
 
 ```powershell
 $env:THERMO_RAW_FILE_READER_DIR = "C:\path\to\RawFileReader"

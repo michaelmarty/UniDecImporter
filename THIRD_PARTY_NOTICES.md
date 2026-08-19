@@ -1,18 +1,26 @@
 # Third-party notices
 
 MassSpecImporter itself is distributed under the BSD 3-Clause License.
+The BSD license does not apply to the bundled Thermo assemblies.
 
 ## Thermo RawFileReader
 
 Thermo support uses Thermo Fisher Scientific's RawFileReader .NET assemblies and
-`pythonnet`. The RawFileReader license permits limited redistribution subject to
-additional requirements and restrictions. To avoid imposing those terms on the
-open-source distribution, the assemblies are **not included in wheels or source
-distributions**. A copy of the vendor license is retained at
-`MassSpecImporter/Thermo/RawFileReaderLicense.doc`.
+`pythonnet`. The four RawFileReader assemblies used by this package are included in
+wheels and source distributions under Thermo Fisher Scientific's separate proprietary
+license. The authoritative license is included at
+`MassSpecImporter/Thermo/RawFileReaderLicense.doc`; a readable notice and the terms that
+apply to package users are in `THERMO_RAWFILEREADER_TERMS.md`.
 
-Install a properly licensed RawFileReader locally and set
-`THERMO_RAW_FILE_READER_DIR` to the directory containing its assemblies.
+Installing or using the bundled assemblies constitutes acceptance of those terms.
+Among other restrictions, end users may not redistribute the Thermo assemblies,
+commercially exploit them or products incorporating them without Thermo's prior written
+consent, reverse engineer them, or use Thermo trademarks to imply endorsement. These
+restrictions apply only to the Thermo assemblies, not to MassSpecImporter's BSD-licensed
+Python source.
+
+`THERMO_RAW_FILE_READER_DIR` may still be used to select another properly licensed
+RawFileReader installation instead of the bundled copy.
 
 RawFileReader reading tool. Copyright © 2016 by Thermo Fisher Scientific, Inc.
 All rights reserved.

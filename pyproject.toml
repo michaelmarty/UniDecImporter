@@ -8,8 +8,12 @@ dynamic = ["version"]
 description = "Standalone, cross-platform readers for mass-spectrometry data"
 readme = "README.md"
 requires-python = ">=3.10"
-license = "BSD-3-Clause"
-license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+license = "BSD-3-Clause AND LicenseRef-Thermo-RawFileReader"
+license-files = [
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "THERMO_RAWFILEREADER_TERMS.md",
+]
 authors = [{ name = "Michael T. Marty", email = "mtmarty@utexas.edu" }]
 keywords = ["mass spectrometry", "mzML", "mzXML", "CD-MS", "ion mobility"]
 classifiers = [
@@ -53,11 +57,12 @@ version = {attr = "MassSpecImporter._version.__version__"}
 include = ["MassSpecImporter*"]
 
 [tool.setuptools.package-data]
-"MassSpecImporter.Thermo" = ["RawFileReaderLicense.doc"]
+"MassSpecImporter.Thermo" = ["RawFileReaderLicense.doc", "*.dll"]
 "MassSpecImporter.Waters" = ["Waters_MassLynxSDK_EULA.txt"]
 
 [tool.setuptools.exclude-package-data]
-"*" = ["*.dll", "*.lib"]
+"MassSpecImporter.Waters" = ["*.dll", "*.lib"]
+"MassSpecImporter.Agilent" = ["*.dll", "*.lib", "*.tlb", "*.config"]
 
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"

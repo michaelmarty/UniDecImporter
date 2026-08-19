@@ -10,10 +10,11 @@
 /*.egg-info/
 /wheel-test/
 
-# The vendor licenses do not permit normal open-source redistribution.
+# Waters and Agilent binaries are not redistributable with this package.
+# The four Thermo RawFileReader assemblies are intentionally tracked under their
+# separate proprietary license; see THERMO_RAWFILEREADER_TERMS.md.
 /MassSpecImporter/Waters/*.dll
 /MassSpecImporter/Waters/*.lib
-/MassSpecImporter/Thermo/*.dll
 /MassSpecImporter/Agilent/*.dll
 /MassSpecImporter/Agilent/*.tlb
 /MassSpecImporter/Agilent/*.XML

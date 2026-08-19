@@ -18,7 +18,8 @@ The tests are grouped as follows:
 - unmarked tests cover numerical helpers, factory dispatch, batch parsing, error paths,
   and generated small files;
 - `integration` tests read the full bundled data from every open format;
-- `vendor` tests require Windows x86-64 and a locally licensed SDK.
+- `vendor` tests require Windows x86-64; Waters and Agilent also require a locally
+  licensed SDK.
 
 Build strict documentation with:
 
@@ -35,5 +36,6 @@ python -m build
 python -m twine check dist/*
 ```
 
-The distribution is deliberately pure Python and excludes test data and all vendor DLLs.
-See `PUBLISHING.md` for the release checklist.
+The distribution includes only the four approved Thermo RawFileReader DLLs. It excludes
+test data and all Waters and Agilent binaries. See `PUBLISHING.md` for the release
+checklist.
