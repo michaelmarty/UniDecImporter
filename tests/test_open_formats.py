@@ -4,8 +4,8 @@ import xml.etree.ElementTree as ET
 import numpy as np
 import pytest
 
-from MassSpecImporter import get_importer
-from MassSpecImporter.MZML.mzML import (
+from UniDecImporter import get_importer
+from UniDecImporter.MZML.mzML import (
     auto_gzip,
     correct_mzML_ID,
     gzip_files,
@@ -13,8 +13,8 @@ from MassSpecImporter.MZML.mzML import (
     get_inj_time,
     search_by_id,
 )
-import MassSpecImporter.MZML.mzML as mzml_module
-from MassSpecImporter.MZXML.mzXML import get_data_from_spectrum as mzxml_data
+import UniDecImporter.MZML.mzML as mzml_module
+from UniDecImporter.MZXML.mzXML import get_data_from_spectrum as mzxml_data
 
 
 def require_real_data(path, minimum_size=1024):

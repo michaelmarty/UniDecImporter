@@ -3,14 +3,14 @@
 Install from PyPI:
 
 ```shell
-python -m pip install mass-spec-importer
+python -m pip install UniDecImporter
 ```
 
 The factory accepts strings and path-like objects:
 
 ```python
 from pathlib import Path
-from MassSpecImporter import get_importer
+from UniDecImporter import get_importer
 
 with get_importer(Path("sample.mzML")) as reader:
     first_scan = reader.get_single_scan(reader.scans[0])
@@ -35,4 +35,3 @@ if reader.cdms_support:
 if reader.imms_support:
     mobility = reader.get_imms_avg_scan(mzbins=1)
 ```
-

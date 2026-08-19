@@ -1,6 +1,6 @@
-site_name: MassSpecImporter
-site_url: https://michaelmarty.github.io/MassSpecImporter/
-repo_url: https://github.com/michaelmarty/MassSpecImporter
+site_name: UniDecImporter
+site_url: https://michaelmarty.github.io/UniDecImporter/
+repo_url: https://github.com/michaelmarty/UniDecImporter
 theme:
   name: mkdocs
 nav:

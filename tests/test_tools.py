@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from MassSpecImporter import tools
-from MassSpecImporter.ImportTools import (
+from UniDecImporter import tools
+from UniDecImporter.ImportTools import (
     IndexedFile,
     IndexedScan,
     compute_bin_indices,

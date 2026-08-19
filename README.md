@@ -1,13 +1,13 @@
-# MassSpecImporter
+# UniDecImporter
 
-MassSpecImporter is a standalone Python package for reading mass-spectrometry data into
+UniDecImporter is a standalone Python package for reading mass-spectrometry data into
 NumPy arrays. It was extracted from UniDec, but has no runtime dependency on UniDec or
 IsoDec.
 
 The same high-level API covers single spectra, LC-MS, CD-MS, and ion-mobility MS:
 
 ```python
-from MassSpecImporter import get_importer
+from UniDecImporter import get_importer
 
 with get_importer("run.mzML") as reader:
     spectrum = reader.get_avg_scan(time_range=(2.0, 2.5))
@@ -17,13 +17,13 @@ with get_importer("run.mzML") as reader:
 ## Installation
 
 ```shell
-python -m pip install mass-spec-importer
+python -m pip install UniDecImporter
 ```
 
 For Thermo RAW support on Windows x86-64, install the optional bridge too:
 
 ```shell
-python -m pip install "mass-spec-importer[thermo]"
+python -m pip install "UniDecImporter[thermo]"
 ```
 
 Python 3.10–3.13 is supported on Windows, macOS, and Linux. Open formats work on all
@@ -78,7 +78,7 @@ calling specialized methods. Readers are context managers, so `with` is preferre
 For a two-column single spectrum:
 
 ```python
-from MassSpecImporter import get_importer
+from UniDecImporter import get_importer
 
 reader = get_importer("spectrum.csv")
 data = reader.get_avg_scan()
@@ -98,8 +98,8 @@ with get_importer("ions.dmt") as reader:
 Large test fixtures use Git LFS:
 
 ```shell
-git clone https://github.com/michaelmarty/MassSpecImporter.git
-cd MassSpecImporter
+git clone https://github.com/michaelmarty/UniDecImporter.git
+cd UniDecImporter
 git lfs pull
 python -m pip install -e ".[test]"
 python -m pytest
@@ -114,6 +114,6 @@ python -m pytest -m "integration and not vendor"
 python -m pytest -m vendor
 ```
 
-See the [documentation](https://michaelmarty.github.io/MassSpecImporter/),
+See the [documentation](https://michaelmarty.github.io/UniDecImporter/),
 [`PUBLISHING.md`](PUBLISHING.md), and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)
 for full details.

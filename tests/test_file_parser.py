@@ -4,7 +4,7 @@ import h5py
 import numpy as np
 import pytest
 
-from MassSpecImporter import FileParser
+from UniDecImporter import FileParser
 
 
 class FakeImporter:

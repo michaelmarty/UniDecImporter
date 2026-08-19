@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from MassSpecImporter import get_importer
-from MassSpecImporter.I2MS.I2MS import I2MSImporter
+from UniDecImporter import get_importer
+from UniDecImporter.I2MS.I2MS import I2MSImporter
 
 
 @pytest.fixture

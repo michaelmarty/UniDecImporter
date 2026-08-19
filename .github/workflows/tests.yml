@@ -37,7 +37,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - run: python -m pip install ".[test]"
-      - run: python -m pytest -m "not integration and not vendor" --cov=MassSpecImporter --cov-report=xml
+      - run: python -m pytest -m "not integration and not vendor" --cov=UniDecImporter --cov-report=xml
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -80,5 +80,5 @@ jobs:
         working-directory: ${{ runner.temp }}
         run: |
           printf "100 2\n101 3\n" > spectrum.txt
-          wheel-test/bin/python -c "from MassSpecImporter import get_importer; d=get_importer('spectrum.txt'); assert d.get_avg_scan().shape == (2, 2)"
+          wheel-test/bin/python -c "from UniDecImporter import get_importer; d=get_importer('spectrum.txt'); assert d.get_avg_scan().shape == (2, 2)"
 

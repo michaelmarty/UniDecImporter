@@ -3,21 +3,21 @@ import platform
 
 import pytest
 
-import MassSpecImporter
-factory_module = importlib.import_module("MassSpecImporter.ImporterFactory")
-from MassSpecImporter import ImporterFactory, get_importer
-from MassSpecImporter.I2MS.I2MS import I2MSImporter
-from MassSpecImporter.MZML.mzML import MZMLImporter
-from MassSpecImporter.MZXML.mzXML import MZXMLImporter
-from MassSpecImporter.SingleScanImporter import SingleScanImporter
-from MassSpecImporter.exceptions import UnsupportedFormatError, VendorReaderUnavailableError
+import UniDecImporter
+factory_module = importlib.import_module("UniDecImporter.ImporterFactory")
+from UniDecImporter import ImporterFactory, get_importer
+from UniDecImporter.I2MS.I2MS import I2MSImporter
+from UniDecImporter.MZML.mzML import MZMLImporter
+from UniDecImporter.MZXML.mzXML import MZXMLImporter
+from UniDecImporter.SingleScanImporter import SingleScanImporter
+from UniDecImporter.exceptions import UnsupportedFormatError, VendorReaderUnavailableError
 
 
 def test_public_api_and_factory_instance():
-    assert MassSpecImporter.__version__ == "0.1.0"
+    assert UniDecImporter.__version__ == "0.1.0"
     assert get_importer is not None
     assert ".mzml" in ImporterFactory().recognized_file_types
-    assert ".raw" in MassSpecImporter.recognized_types
+    assert ".raw" in UniDecImporter.recognized_types
 
 
 @pytest.mark.integration

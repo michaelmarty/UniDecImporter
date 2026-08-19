@@ -1,14 +1,14 @@
 """Package-specific exceptions."""
 
 
-class MassSpecImporterError(Exception):
+class UniDecImporterError(Exception):
     """Base error for this package."""
 
 
-class UnsupportedFormatError(MassSpecImporterError, OSError):
+class UnsupportedFormatError(UniDecImporterError, OSError):
     """Raised when no reader is registered for a path."""
 
 
-class VendorReaderUnavailableError(MassSpecImporterError):
+class VendorReaderUnavailableError(UniDecImporterError):
     """Raised when a vendor reader cannot run on the current platform."""
 

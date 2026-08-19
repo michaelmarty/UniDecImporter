@@ -3,8 +3,8 @@
 Clone the repository, download the Git LFS fixtures, and install an editable environment:
 
 ```shell
-git clone https://github.com/michaelmarty/MassSpecImporter.git
-cd MassSpecImporter
+git clone https://github.com/michaelmarty/UniDecImporter.git
+cd UniDecImporter
 git lfs pull
 python -m pip install -e ".[test]"
 python -m pytest

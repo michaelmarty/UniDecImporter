@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from MassSpecImporter import get_importer
-from MassSpecImporter.SingleScanImporter import SingleScanImporter
+from UniDecImporter import get_importer
+from UniDecImporter.SingleScanImporter import SingleScanImporter
 
 
 @pytest.mark.integration

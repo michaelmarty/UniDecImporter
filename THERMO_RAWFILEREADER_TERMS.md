@@ -1,6 +1,6 @@
 # Thermo RawFileReader proprietary terms
 
-MassSpecImporter's BSD 3-Clause License applies to the Python source code. It does **not**
+UniDecImporter's BSD 3-Clause License applies to the Python source code. It does **not**
 apply to these bundled assemblies:
 
 - `ThermoFisher.CommonCore.BackgroundSubtraction.dll`
@@ -10,7 +10,7 @@ apply to these bundled assemblies:
 
 Those assemblies are proprietary software licensed by Thermo Finnigan LLC. The complete,
 authoritative Software License Agreement is distributed with them at
-`MassSpecImporter/Thermo/RawFileReaderLicense.doc`.
+`UniDecImporter/Thermo/RawFileReaderLicense.doc`.
 
 ## Acceptance and redistribution
 
@@ -19,7 +19,7 @@ License Agreement. If you do not accept it, do not install or use the bundled as
 An open-format-only source installation can omit the four DLL files listed above.
 
 As an end user of this package, you may not redistribute the Thermo assemblies to others.
-This prohibition does not restrict redistribution of MassSpecImporter's BSD-licensed
+This prohibition does not restrict redistribution of UniDecImporter's BSD-licensed
 Python source without the Thermo assemblies.
 
 The vendor license also includes restrictions on decompilation, disassembly, reverse
@@ -43,4 +43,4 @@ reserved.
 
 Thermo Fisher Scientific and RawFileReader are referenced only to identify the vendor and
 software dependency. Their inclusion does not imply that Thermo Fisher Scientific or
-Thermo Finnigan LLC provides, sponsors, or endorses MassSpecImporter.
+Thermo Finnigan LLC provides, sponsors, or endorses UniDecImporter.

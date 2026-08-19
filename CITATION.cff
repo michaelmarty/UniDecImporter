@@ -1,6 +1,6 @@
 cff-version: 1.2.0
-message: If you use MassSpecImporter, please cite this software and the relevant data-format libraries.
-title: MassSpecImporter
+message: If you use UniDecImporter, please cite this software and the relevant data-format libraries.
+title: UniDecImporter
 type: software
 authors:
   - family-names: Marty
@@ -8,8 +8,8 @@ authors:
     email: mtmarty@utexas.edu
 abstract: Standalone readers for open and vendor mass-spectrometry data formats.
 version: "0.1.0"
-repository-code: "https://github.com/michaelmarty/MassSpecImporter"
-url: "https://michaelmarty.github.io/MassSpecImporter/"
+repository-code: "https://github.com/michaelmarty/UniDecImporter"
+url: "https://michaelmarty.github.io/UniDecImporter/"
 license: BSD-3-Clause
 keywords:
   - mass spectrometry

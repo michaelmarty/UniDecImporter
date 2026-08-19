@@ -3,7 +3,7 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mass-spec-importer"
+name = "UniDecImporter"
 dynamic = ["version"]
 description = "Standalone, cross-platform readers for mass-spectrometry data"
 readme = "README.md"
@@ -45,24 +45,24 @@ agilent = ["pythonnet>=3.0; platform_system == 'Windows' and platform_machine ==
 vendor = ["pythonnet>=3.0; platform_system == 'Windows' and platform_machine == 'AMD64'"]
 
 [project.urls]
-Homepage = "https://github.com/michaelmarty/MassSpecImporter"
-Repository = "https://github.com/michaelmarty/MassSpecImporter"
-Issues = "https://github.com/michaelmarty/MassSpecImporter/issues"
-Documentation = "https://michaelmarty.github.io/MassSpecImporter/"
+Homepage = "https://github.com/michaelmarty/UniDecImporter"
+Repository = "https://github.com/michaelmarty/UniDecImporter"
+Issues = "https://github.com/michaelmarty/UniDecImporter/issues"
+Documentation = "https://michaelmarty.github.io/UniDecImporter/"
 
 [tool.setuptools.dynamic]
-version = {attr = "MassSpecImporter._version.__version__"}
+version = {attr = "UniDecImporter._version.__version__"}
 
 [tool.setuptools.packages.find]
-include = ["MassSpecImporter*"]
+include = ["UniDecImporter*"]
 
 [tool.setuptools.package-data]
-"MassSpecImporter.Thermo" = ["RawFileReaderLicense.doc", "*.dll"]
-"MassSpecImporter.Waters" = ["Waters_MassLynxSDK_EULA.txt"]
+"UniDecImporter.Thermo" = ["RawFileReaderLicense.doc", "*.dll"]
+"UniDecImporter.Waters" = ["Waters_MassLynxSDK_EULA.txt"]
 
 [tool.setuptools.exclude-package-data]
-"MassSpecImporter.Waters" = ["*.dll", "*.lib"]
-"MassSpecImporter.Agilent" = ["*.dll", "*.lib", "*.tlb", "*.config"]
+"UniDecImporter.Waters" = ["*.dll", "*.lib"]
+"UniDecImporter.Agilent" = ["*.dll", "*.lib", "*.tlb", "*.config"]
 
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"
@@ -77,7 +77,7 @@ filterwarnings = [
 
 [tool.coverage.run]
 branch = true
-source = ["MassSpecImporter"]
+source = ["UniDecImporter"]
 
 [tool.coverage.report]
 show_missing = true

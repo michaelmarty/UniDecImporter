@@ -2,11 +2,11 @@
 
 ## Factory and errors
 
-`MassSpecImporter.get_importer(file_path, **kwargs)` delegates to
+`UniDecImporter.get_importer(file_path, **kwargs)` delegates to
 `ImporterFactory.create_importer`. Unknown extensions raise `UnsupportedFormatError`.
 Unavailable vendor platforms or runtimes raise `VendorReaderUnavailableError`.
 
-`MassSpecImporter.get_polarity(path)` is a convenience function that returns a polarity
+`UniDecImporter.get_polarity(path)` is a convenience function that returns a polarity
 string and preserves the historical positive fallback on read failure.
 
 ## Common reader state
@@ -32,7 +32,7 @@ string and preserves the historical positive fallback on read failure.
 
 ## FileParser
 
-`MassSpecImporter.FileParser` contains batch slicing helpers for writing averaged time or
+`UniDecImporter.FileParser` contains batch slicing helpers for writing averaged time or
 scan windows to text or UniDec-compatible HDF5 datasets: `parse`, `parse_multiple`,
 `extract`, `extract_scans`, `extract_timepoints`, and `extract_scans_multiple_files`.
 

@@ -13,9 +13,9 @@
 # Waters and Agilent binaries are not redistributable with this package.
 # The four Thermo RawFileReader assemblies are intentionally tracked under their
 # separate proprietary license; see THERMO_RAWFILEREADER_TERMS.md.
-/MassSpecImporter/Waters/*.dll
-/MassSpecImporter/Waters/*.lib
-/MassSpecImporter/Agilent/*.dll
-/MassSpecImporter/Agilent/*.tlb
-/MassSpecImporter/Agilent/*.XML
-/MassSpecImporter/Agilent/*.config
+/UniDecImporter/Waters/*.dll
+/UniDecImporter/Waters/*.lib
+/UniDecImporter/Agilent/*.dll
+/UniDecImporter/Agilent/*.tlb
+/UniDecImporter/Agilent/*.XML
+/UniDecImporter/Agilent/*.config

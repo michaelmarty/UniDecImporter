@@ -1,4 +1,4 @@
-"""Minimal HDF5 helpers used by :mod:`MassSpecImporter.FileParser`."""
+"""Minimal HDF5 helpers used by :mod:`UniDecImporter.FileParser`."""
 
 
 def replace_dataset(group, name, data):

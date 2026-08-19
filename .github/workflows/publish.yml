@@ -28,11 +28,11 @@ jobs:
         env:
           PUBLISHED_TAG: ${{ github.event.release.tag_name }}
         run: |
-          version="$(sed -nE 's/^__version__[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' MassSpecImporter/_version.py)"
+          version="$(sed -nE 's/^__version__[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' UniDecImporter/_version.py)"
           test -n "$version"
           tag="v$version"
           if [[ "${{ github.event_name }}" == "release" && "$PUBLISHED_TAG" != "$tag" ]]; then
-            echo "Release tag does not match MassSpecImporter/_version.py" >&2
+            echo "Release tag does not match UniDecImporter/_version.py" >&2
             exit 1
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
@@ -70,7 +70,7 @@ jobs:
               thermo = {
                   pathlib.PurePosixPath(name).name
                   for name in lowered
-                  if "/massspecimporter/thermo/" in f"/{name}" and name.endswith(".dll")
+                  if "/unidecimporter/thermo/" in f"/{name}" and name.endswith(".dll")
               }
               if thermo != expected_thermo:
                   raise SystemExit(
@@ -84,7 +84,7 @@ jobs:
                   or (
                       name.endswith(".dll")
                       and not (
-                          "/massspecimporter/thermo/" in f"/{name}"
+                          "/unidecimporter/thermo/" in f"/{name}"
                           and pathlib.PurePosixPath(name).name in expected_thermo
                       )
                   )
@@ -93,7 +93,7 @@ jobs:
                   raise SystemExit(f"forbidden files in {artifact}: {forbidden}")
               required_notices = (
                   "thermo_rawfilereader_terms.md",
-                  "massspecimporter/thermo/rawfilereaderlicense.doc",
+                  "unidecimporter/thermo/rawfilereaderlicense.doc",
               )
               missing = [item for item in required_notices if not any(name.endswith(item) for name in lowered)]
               if missing:
@@ -131,7 +131,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/mass-spec-importer
+      url: https://pypi.org/p/unidecimporter
     permissions:
       id-token: write
     steps:

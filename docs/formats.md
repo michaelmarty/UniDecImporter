@@ -30,7 +30,7 @@ $env:AGILENT_DA_SDK_DIR = "C:\path\to\MassHunter\DataAnalysis"
 ```
 
 Thermo and Agilent also require `pythonnet`; install it with
-`python -m pip install "mass-spec-importer[vendor]"` on Windows AMD64.
+`python -m pip install "UniDecImporter[vendor]"` on Windows AMD64.
 Waters companion DLLs should be placed beside `MassLynxRaw.dll` or otherwise be visible
 to the Windows loader.
 

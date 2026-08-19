@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from MassSpecImporter.Importer import Importer
+from UniDecImporter.Importer import Importer
 
 
 class DummyImporter(Importer):
