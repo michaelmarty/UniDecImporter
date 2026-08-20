@@ -52,6 +52,11 @@ data files, but importing and using open-format readers does not load them.
 | Waters RAW directory | LC-MS, IM-MS | Windows x86-64 only | Waters MassLynx SDK |
 | Agilent `.d` | LC-MS, MS/MS | Windows x86-64 only | Agilent MassHunter Data Access SDK + pythonnet |
 
+NPZ single-scan files must contain an array named `data`. Numeric arrays load without
+pickle support. Legacy CD-MS files with object-backed `data` arrays are also supported,
+but emit a warning because they require pickle deserialization; load those files only
+from trusted sources.
+
 The four Thermo RawFileReader assemblies are bundled under their separate proprietary
 terms. Waters and Agilent SDK licenses do not permit this project to redistribute those
 binaries, so users must obtain them separately. Set `THERMO_RAW_FILE_READER_DIR` to

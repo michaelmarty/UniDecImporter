@@ -68,6 +68,17 @@ def test_cdms_defaults_missing_metadata_columns(tmp_path):
     np.testing.assert_array_equal(cdms[:, 4], [-1, -1])
 
 
+def test_object_backed_npz_cdms_data_loads_with_trust_warning(tmp_path):
+    path = tmp_path / "scan.npz"
+    data = np.array([[100.0, 2.0, 1, 1.0, 0.0], [101.0, 3.0, 1, 1.0, 0.1]], dtype=object)
+    np.savez(path, data=data)
+
+    with pytest.warns(UserWarning, match="only load trusted files"):
+        cdms = SingleScanImporter(path).get_cdms_data()
+
+    np.testing.assert_array_equal(cdms, data)
+
+
 def test_direct_single_scan_importer_rejects_unknown_extension(tmp_path):
     path = tmp_path / "scan.unknown"
     path.write_text("100 2\n", encoding="utf-8")

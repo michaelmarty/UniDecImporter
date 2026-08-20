@@ -1,6 +1,7 @@
 """Reader for spectra stored directly in text, NumPy, or binary arrays."""
 
 import os
+import warnings
 import numpy as np
 from .Importer import Importer
 from .ImportTools import header_test
@@ -40,8 +41,19 @@ class SingleScanImporter(Importer):
             self.data = np.loadtxt(self._file_path, delimiter=",", skiprows=header_test(self._file_path),
                                    usecols=(0, 1))
         elif ext == '.npz':
-            with np.load(self._file_path, allow_pickle=False) as archive:
-                self.data = archive['data']
+            try:
+                with np.load(self._file_path, allow_pickle=False) as archive:
+                    self.data = archive['data']
+            except ValueError as error:
+                if "Object arrays cannot be loaded when allow_pickle=False" not in str(error):
+                    raise
+                warnings.warn(
+                    "Loading an object-backed NPZ data array requires pickle; only load trusted files.",
+                    UserWarning,
+                    stacklevel=2,
+                )
+                with np.load(self._file_path, allow_pickle=True) as archive:
+                    self.data = archive['data']
         elif ext == '.bin':
             raw = np.fromfile(self._file_path, dtype=np.float64)
             if raw.size % 2:
@@ -130,7 +142,6 @@ if __name__ == "__main__":
     path = r"Z:\Group Share\BHT\Q Exactive HF Data\RPLC-MS\Acquity UPLC\CDMS Injections to Stitch\20251216\20251216_BHT_0o1mgmL_carbonicanhydrase_CDMS_2uLinj_merged.npz"
     importer = SingleScanImporter(path)
     print(importer.get_cdms_data())
-
 
 
 
