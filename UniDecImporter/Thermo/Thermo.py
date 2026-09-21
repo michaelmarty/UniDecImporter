@@ -85,14 +85,17 @@ class ThermoImporter(Importer):
         else:
             return np.empty((0, 2))
 
-    def get_avg_scan(self, scan_range=None, time_range=None):
-        """Return a RawFileReader average over an inclusive scan or time range."""
+    def get_avg_scan(self, scan_range=None, time_range=None, sum_mode=False):
+        """Return averaged intensities, or summed intensities when *sum_mode* is true."""
         scan_range = self.scan_range_from_inputs(scan_range, time_range)
 
-        if scan_range[1] - scan_range[0] > 1:
+        if scan_range[1] > scan_range[0]:
             print("Getting Data from Scans:", scan_range)
             scan_range = [scan_range[0], scan_range[1]]
             data = np.array(list(self.msrun.GetAverageSpectrum(scan_range)))
+            if sum_mode:
+                count = np.count_nonzero((self.scans >= scan_range[0]) & (self.scans <= scan_range[1]))
+                data[:, 1] *= count
         else:
             print("Getting Data from Scan:", scan_range[0])
             impdat = self.get_single_scan(scan_range[0])

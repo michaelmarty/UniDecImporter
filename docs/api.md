@@ -23,9 +23,10 @@ string and preserves the historical positive fallback on read failure.
 
 - `get_single_scan(scan)` returns one `N x 2` m/z-intensity array.
 - `get_all_scans()` returns a list of spectra in scan order.
-- `get_avg_scan(scan_range=None, time_range=None)` merges an inclusive range. A supplied
-  time range takes precedence and is converted to its nearest endpoint scans.
-- `avg_fast(scan_range=None, time_range=None)` is the shared cached-data averaging
+- `get_avg_scan(scan_range=None, time_range=None, sum_mode=False)` averages an inclusive
+  range; `sum_mode=True` sums intensities instead. A supplied time range takes precedence
+  and is converted to its nearest endpoint scans.
+- `avg_fast(scan_range=None, time_range=None, sum_mode=False)` is the shared cached-data averaging
   implementation used by format readers.
 - `get_mz_localmax(mz, mz_tol)` returns local (`m/z`, intensity) peaks across scans,
   using a tolerance in ppm.

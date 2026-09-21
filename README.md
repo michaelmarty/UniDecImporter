@@ -83,8 +83,8 @@ NumPy `N x 2` arrays. Specialized return shapes are noted below.
 |---|---|
 | `get_single_scan(scan)` | Return one spectrum as `N x 2` (`m/z`, intensity). |
 | `get_all_scans()` | Load and return all spectra as a list in scan order. |
-| `get_avg_scan(scan_range=None, time_range=None)` | Merge spectra over an inclusive scan range or a retention-time range. Reader implementations may use a streaming path for large files. |
-| `avg_fast(scan_range=None, time_range=None)` | Merge spectra through the shared cached-data implementation used by format readers. Most applications should call `get_avg_scan`. |
+| `get_avg_scan(scan_range=None, time_range=None, sum_mode=False)` | Average spectra over an inclusive scan or retention-time range; set `sum_mode=True` to sum intensities. |
+| `avg_fast(scan_range=None, time_range=None, sum_mode=False)` | Average spectra through the shared cached-data implementation. Most applications should call `get_avg_scan`. |
 | `get_mz_localmax(mz, mz_tol)` | Find each scan's local peak near `mz`; `mz_tol` is in ppm. Return (`m/z`, intensity) rows and omit scans with no peak. |
 
 Supplying `time_range` selects the nearest endpoint scans and takes precedence over a
@@ -189,7 +189,9 @@ for full details.
 
 Well, we got too fancy and burned up a bunch of GitHub LFS bandwidth, so this version uses a smaller set of test files and removes Git LFS from the repository.
 
+Improved test coverage for mzML, mzXML, and NPZ readers.
 
+Harmonized sum vs average behavior to have average by default and sum only when `sum_mode=True`.
 
 ### Version 1.0.1
 
@@ -197,4 +199,4 @@ Fix to npz bug.
 
 ### Version 1.0.0
 
-Initial release of standalone package. 
+Initial release of standalone package.

@@ -8,6 +8,8 @@ from UniDecImporter.ImporterFactory import VendorReaderUnavailableError
 
 
 WINDOWS_X64 = platform.system() == "Windows" and platform.machine().lower() in {"amd64", "x86_64", "x64"}
+PAIRED_FILES = ("test_thermo.RAW", "test_mzml.mzML", "test_mzxml.mzXML", "test_mzmlgz.mzML.gz")
+PAIRED_SCAN_COUNT = 424
 
 
 def open_vendor_or_skip(path, **kwargs):
@@ -17,6 +19,60 @@ def open_vendor_or_skip(path, **kwargs):
         return get_importer(path, **kwargs)
     except VendorReaderUnavailableError as error:
         pytest.skip(str(error))
+
+
+@pytest.fixture(scope="module")
+def paired_spectra(data_dir):
+    importers = []
+    try:
+        for filename in PAIRED_FILES:
+            importer = (open_vendor_or_skip if filename.endswith(".RAW") else get_importer)(
+                data_dir / filename, silent=True
+            )
+            importers.append(importer)
+        yield {
+            filename: (importer, importer.get_avg_scan(), importer.get_single_scan(200))
+            for filename, importer in zip(PAIRED_FILES, importers)
+        }
+    finally:
+        for importer in importers:
+            importer.close()
+
+
+@pytest.mark.vendor
+@pytest.mark.integration
+def test_paired_thermo_and_open_format_spectra_are_similar(paired_spectra):
+    _, reference_average, reference_scan = paired_spectra["test_thermo.RAW"]
+    for _, average, scan in paired_spectra.values():
+        np.testing.assert_allclose(scan, reference_scan, rtol=1e-7, atol=1e-6)
+        common = (reference_average[:, 0] >= average[0, 0]) & (reference_average[:, 0] <= average[-1, 0])
+        aligned = np.interp(reference_average[common, 0], average[:, 0], average[:, 1])
+        assert np.corrcoef(reference_average[common, 1], aligned)[0, 1] > 0.999
+
+
+@pytest.mark.vendor
+@pytest.mark.integration
+def test_paired_average_peak(paired_spectra):
+    for _, average, _ in paired_spectra.values():
+        peak = average[np.argmax(average[:, 1])]
+        assert peak[0] == pytest.approx(2756.4220, abs=0.3)
+        assert peak[1] == pytest.approx(1.36e6, rel=0.03)
+
+
+@pytest.mark.vendor
+@pytest.mark.integration
+def test_paired_sum_mode(paired_spectra):
+    for importer, average, _ in paired_spectra.values():
+        summed = importer.get_avg_scan(sum_mode=True)
+        np.testing.assert_allclose(summed[:, 1], average[:, 1] * PAIRED_SCAN_COUNT)
+
+
+@pytest.mark.vendor
+@pytest.mark.integration
+def test_paired_scan_count_and_retention_time(paired_spectra):
+    for importer, _, _ in paired_spectra.values():
+        assert len(importer.scans) == PAIRED_SCAN_COUNT
+        assert importer.get_max_time() == pytest.approx(5.00, abs=0.01)
 
 
 @pytest.mark.vendor

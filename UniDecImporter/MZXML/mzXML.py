@@ -84,7 +84,7 @@ class MZXMLImporter(Importer):
         # self.msrun.reset()
         return dat
 
-    def avg_safe(self, scan_range=None, time_range=None):
+    def avg_safe(self, scan_range=None, time_range=None, sum_mode=False):
         """Stream and merge selected scans without caching the complete run."""
         scan_range = self.scan_range_from_inputs(scan_range, time_range)
 
@@ -97,6 +97,7 @@ class MZXMLImporter(Importer):
         # print("Length merge axis:", len(template))
         newdat = ud.mergedata(template, data)
         template[:, 1] += newdat[:, 1]
+        count = 1
 
         # Get other data points
         index = 0
@@ -112,11 +113,14 @@ class MZXMLImporter(Importer):
                     data = get_data_from_spectrum(spec)
                     newdat = ud.mergedata(template, data)
                     template[:, 1] += newdat[:, 1]
+                    count += 1
                 elif s <= scan_range[0]:
                     pass
                 else:
                     break
         self.msrun.reset()
+        if not sum_mode:
+            template[:, 1] /= count
         return template
 
     def get_all_scans(self, threshold=-1):
@@ -139,15 +143,15 @@ class MZXMLImporter(Importer):
         return self.data
 
 
-    def get_avg_scan(self, scan_range=None, time_range=None):
+    def get_avg_scan(self, scan_range=None, time_range=None, sum_mode=False):
         """
         Returns merged 1D MS data from mzML import
         :return: merged data
         """
         if self.filesize > 1e9 and self.data is None:
-            data = self.avg_safe(scan_range, time_range)
+            data = self.avg_safe(scan_range, time_range, sum_mode=sum_mode)
         else:
-            data = self.avg_fast(scan_range, time_range)
+            data = self.avg_fast(scan_range, time_range, sum_mode=sum_mode)
         return data
 
     def get_tic(self):

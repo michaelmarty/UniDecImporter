@@ -83,13 +83,15 @@ class I2MSImporter(Importer):
         """Return the inclusive minimum and maximum scan identifiers."""
         return list(self.scan_range)
 
-    def get_avg_scan(self, bins=1, scan_range=None, time_range=None):
-        """Bin and sum CD-MS events into a two-column spectrum."""
+    def get_avg_scan(self, bins=1, scan_range=None, time_range=None, sum_mode=False):
+        """Bin and average CD-MS events by scan, or sum them when requested."""
         del time_range
         if scan_range is not None:
             all_scans = self.get_cdms_data_by_scans(scan_range)[:, :2]
+            count = np.count_nonzero((self.scans >= scan_range[0]) & (self.scans <= scan_range[1]))
         else:
             all_scans = self.get_cdms_data()[:, :2]
+            count = len(self.scans)
         if len(all_scans) == 0:
             return np.empty((0, 2))
         width = float(bins)
@@ -99,6 +101,8 @@ class I2MSImporter(Importer):
         edges = np.arange(np.floor(mz.min() / width) * width,
                           np.ceil(mz.max() / width) * width + width, width)
         summed, edges = np.histogram(mz, bins=edges, weights=intensity)
+        if not sum_mode:
+            summed /= count
         return np.column_stack((edges[:-1], summed))
 
 

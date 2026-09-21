@@ -32,7 +32,9 @@ def test_i2ms_cdms_filter_and_average(i2ms):
     np.testing.assert_array_equal(subset, cdms)
     average = i2ms.get_avg_scan(bins=2)
     assert average.shape[1] == 2
-    assert average[:, 1].sum() == pytest.approx(cdms[:, 1].sum())
+    assert average[:, 1].sum() == pytest.approx(cdms[:, 1].sum() / len(i2ms.scans))
+    summed = i2ms.get_avg_scan(bins=2, sum_mode=True)
+    assert summed[:, 1].sum() == pytest.approx(cdms[:, 1].sum())
     with pytest.raises(ValueError):
         i2ms.get_avg_scan(bins=0)
 

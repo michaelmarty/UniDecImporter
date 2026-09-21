@@ -88,17 +88,18 @@ class WatersDataImporter(Importer):
         print("Names: ", self.stat_names)
         return 0
 
-    def get_avg_scan(self, scan_range=None, time_range=None, mzbins=None):
-        """Combine selected scans, optionally using a fixed m/z bin width."""
+    def get_avg_scan(self, scan_range=None, time_range=None, mzbins=None, sum_mode=False):
+        """Average selected scans, optionally summing or using a fixed m/z bin width."""
         scan_range = self.scan_range_from_inputs(scan_range, time_range)
 
         mzs, ivals = self.readerMS.combineScan(self.function, np.arange(scan_range[0]-1, scan_range[1]))
         data = np.transpose([mzs, ivals])
-        if mzbins is None or float(mzbins) == 0:
-            return data
-        else:
+        if mzbins is not None and float(mzbins) != 0:
             data = merge_spectra([data], mzbins=mzbins, type="Integrate")
-            return data
+        if not sum_mode:
+            count = np.count_nonzero((self.scans >= scan_range[0]) & (self.scans <= scan_range[1]))
+            data[:, 1] /= count
+        return data
 
     def get_all_scans(self):
         """Load every spectrum for the selected MassLynx function."""

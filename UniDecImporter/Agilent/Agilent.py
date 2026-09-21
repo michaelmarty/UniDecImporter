@@ -46,16 +46,19 @@ class AgilentImporter(Importer):
             data = data[data[:, 1] > threshold]
         return data
 
-    def get_avg_scan(self, scan_range=None, time_range=None, mzbins=None):
-        """Merge selected scans, optionally using a fixed m/z bin width."""
+    def get_avg_scan(self, scan_range=None, time_range=None, mzbins=None, sum_mode=False):
+        """Average selected scans, optionally summing or using a fixed m/z bin width."""
         if mzbins is None:
-            return self.avg_fast(scan_range, time_range)
+            return self.avg_fast(scan_range, time_range, sum_mode=sum_mode)
         from ..ImportTools import merge_spectra
 
         scan_range = self.scan_range_from_inputs(scan_range, time_range)
         spectra = [self.get_single_scan(scan) for scan in self.scans
                    if scan_range[0] <= scan <= scan_range[1]]
-        return merge_spectra(spectra, mzbins=mzbins)
+        data = merge_spectra(spectra, mzbins=mzbins, type="Interpolate")
+        if not sum_mode:
+            data[:, 1] /= sum(len(spectrum) > 0 for spectrum in spectra)
+        return data
 
     def get_tic(self):
         """Return the total-ion chromatogram."""

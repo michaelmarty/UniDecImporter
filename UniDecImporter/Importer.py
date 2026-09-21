@@ -64,8 +64,8 @@ class Importer:
         raise NotImplementedError
 
     # averaged scans
-    def get_avg_scan(self, scan_range=None, time_range=None):
-        """Return a merged spectrum for an inclusive scan or retention-time range."""
+    def get_avg_scan(self, scan_range=None, time_range=None, sum_mode=False):
+        """Return an averaged spectrum, or summed intensities when *sum_mode* is true."""
         raise NotImplementedError
 
     # Single scan data
@@ -205,8 +205,8 @@ class Importer:
         print("Scan Range:", scan_range)
         return scan_range
 
-    def avg_fast(self, scan_range=None, time_range=None):
-        """Merge cached spectra over an inclusive scan or retention-time range."""
+    def avg_fast(self, scan_range=None, time_range=None, sum_mode=False):
+        """Average cached spectra, or sum them when *sum_mode* is true."""
         if self.data is None:
             self.get_all_scans()
 
@@ -226,7 +226,10 @@ class Importer:
             return None
         elif len(data) > 1:
             try:
-                data = merge_spectra(data)
+                count = sum(len(spectrum) > 0 for spectrum in data)
+                data = merge_spectra(data, type="Interpolate")
+                if not sum_mode:
+                    data[:, 1] /= count
             except Exception as e:
                 print("Merge Spectra Error 2:", e)
                 print(data)

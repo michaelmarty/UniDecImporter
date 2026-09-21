@@ -27,8 +27,8 @@ class DummyImporter(Importer):
     def get_single_scan(self, scan):
         return self._spectra[self.get_scan_index(scan)]
 
-    def get_avg_scan(self, scan_range=None, time_range=None):
-        return self.avg_fast(scan_range, time_range)
+    def get_avg_scan(self, scan_range=None, time_range=None, sum_mode=False):
+        return self.avg_fast(scan_range, time_range, sum_mode=sum_mode)
 
     def get_all_imms_scans(self):
         self.immsdata = [
@@ -63,7 +63,9 @@ def test_base_ranges_averaging_and_centroiding(tmp_path):
     np.testing.assert_array_equal(importer.scan_range_from_inputs((-5, 99)), [1, 5])
     np.testing.assert_array_equal(importer.scan_range_from_inputs(time_range=(0.9, 0.9)), [3, 3])
     averaged = importer.get_avg_scan(scan_range=(1, 3))
-    np.testing.assert_allclose(averaged[:, 1], [3, 6, 3])
+    np.testing.assert_allclose(averaged[:, 1], [1.5, 3, 1.5], rtol=0.02)
+    summed = importer.get_avg_scan(scan_range=(1, 3), sum_mode=True)
+    np.testing.assert_allclose(summed[:, 1], [3, 6, 3], rtol=0.02)
     assert isinstance(importer.check_centroided(), bool)
     maxima = importer.get_mz_localmax(101, 10_000)
     assert maxima.shape == (3, 2)
@@ -100,4 +102,3 @@ def test_base_abstract_and_capability_errors(tmp_path):
         base.get_imms_avg_scan()
     with pytest.raises(FileNotFoundError):
         Importer(tmp_path / "missing")
-

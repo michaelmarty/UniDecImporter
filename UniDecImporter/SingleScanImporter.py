@@ -75,7 +75,7 @@ class SingleScanImporter(Importer):
         """Return the sole m/z-intensity spectrum; *scan* is ignored."""
         return self.load_data()[:, :2]
 
-    def get_avg_scan(self, scan_range=None, time_range=None):
+    def get_avg_scan(self, scan_range=None, time_range=None, sum_mode=False):
         """Return the sole spectrum; range arguments are ignored."""
         return self.load_data()[:, :2]
 
