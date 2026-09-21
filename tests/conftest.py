@@ -15,8 +15,7 @@ def data_dir():
 
 
 def require_real_data(path: Path, minimum_size=1024):
-    """Skip cleanly when a Git LFS object was not downloaded."""
+    """Skip cleanly when bundled test data are unavailable."""
     if not path.exists() or (path.is_file() and path.stat().st_size < minimum_size):
-        pytest.skip(f"test data unavailable (run git lfs pull): {path}")
+        pytest.skip(f"test data unavailable: {path}")
     return path
-

@@ -3,7 +3,7 @@
 UniDecImporter uses setuptools and produces a universal wheel plus a source
 distribution. Both intentionally contain four Windows-only Thermo RawFileReader DLLs
 under Thermo's separate proprietary license. Waters and Agilent binaries and the large
-Git LFS test corpus are excluded.
+test corpus are excluded.
 
 Publishing the Thermo assemblies invokes the vendor license's distributor obligations,
 including its indemnification requirement, required copyright notice, end-user
@@ -15,7 +15,7 @@ authoritative `UniDecImporter/Thermo/RawFileReaderLicense.doc` before every rele
 
 1. Update `UniDecImporter/_version.py` and `CITATION.cff` to the same version.
 2. Update the README, documentation, release notes, and third-party notices.
-3. Run `git lfs pull` and the complete test suite on licensed development machines.
+3. Run the complete test suite on licensed development machines.
 4. Build locally and confirm that the four approved Thermo DLLs are present and that no
    other vendor binary or test data is included.
 5. Push the release commit and run the **Build and publish** workflow.

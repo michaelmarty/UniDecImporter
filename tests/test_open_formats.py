@@ -19,7 +19,7 @@ from UniDecImporter.MZXML.mzXML import get_data_from_spectrum as mzxml_data
 
 def require_real_data(path, minimum_size=1024):
     if not path.exists() or (path.is_file() and path.stat().st_size < minimum_size):
-        pytest.skip(f"test data unavailable (run git lfs pull): {path}")
+        pytest.skip(f"test data unavailable: {path}")
     return path
 
 

@@ -163,12 +163,9 @@ with get_importer("ions.dmt") as reader:
 
 ## Development
 
-Large test fixtures use Git LFS:
-
 ```shell
 git clone https://github.com/michaelmarty/UniDecImporter.git
 cd UniDecImporter
-git lfs pull
 python -m pip install -e ".[test]"
 python -m pytest
 ```
@@ -185,3 +182,19 @@ python -m pytest -m vendor
 See the [documentation](https://michaelmarty.github.io/UniDecImporter/),
 [`PUBLISHING.md`](PUBLISHING.md), and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)
 for full details.
+
+## Change Log
+
+### Version 1.0.2
+
+Well, we got too fancy and burned up a bunch of GitHub LFS bandwidth, so this version uses a smaller set of test files and removes Git LFS from the repository.
+
+
+
+### Version 1.0.1
+
+Fix to npz bug.
+
+### Version 1.0.0
+
+Initial release of standalone package. 

@@ -2,8 +2,13 @@ name: Tests
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -40,50 +45,37 @@ jobs:
       - run: python -m pytest -m "not integration and not vendor"
 
   open-format-integration:
-    name: Open formats / ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-14]
+    if: github.event_name == 'workflow_dispatch'
+    name: Open formats / Linux
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-        with:
-          lfs: true
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
           cache: pip
-      - run: git lfs pull
       - run: python -m pip install ".[test]"
       - name: Run all open-format tests with coverage
-        if: runner.os == 'Linux'
         run: >-
           python -m pytest -m "not vendor"
           --cov=UniDecImporter --cov-report=term-missing --cov-report=xml
-      - name: Run open-format integration tests
-        if: runner.os != 'Linux'
-        run: python -m pytest -m "integration and not vendor"
       - uses: actions/upload-artifact@v7
-        if: runner.os == 'Linux'
         with:
           name: coverage-open-formats
           path: coverage.xml
           if-no-files-found: error
 
   thermo-integration:
+    if: github.event_name == 'workflow_dispatch'
     name: Thermo RAW / Windows x86-64
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v6
-        with:
-          lfs: true
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
           architecture: x64
           cache: pip
-      - run: git lfs pull
       - run: python -m pip install ".[test,thermo]"
       - run: python -m pytest tests/test_vendor_formats.py -m "vendor and integration" -k "thermo_"
 
