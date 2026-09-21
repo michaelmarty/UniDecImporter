@@ -45,7 +45,6 @@ jobs:
       - run: python -m pytest -m "not integration and not vendor"
 
   open-format-integration:
-    if: github.event_name == 'workflow_dispatch'
     name: Open formats / Linux
     runs-on: ubuntu-latest
     steps:
@@ -66,7 +65,6 @@ jobs:
           if-no-files-found: error
 
   thermo-integration:
-    if: github.event_name == 'workflow_dispatch'
     name: Thermo RAW / Windows x86-64
     runs-on: windows-latest
     steps:
@@ -77,7 +75,7 @@ jobs:
           architecture: x64
           cache: pip
       - run: python -m pip install ".[test,thermo]"
-      - run: python -m pytest tests/test_vendor_formats.py -m "vendor and integration" -k "thermo_"
+      - run: python -m pytest tests/test_vendor_formats.py -m "vendor and integration" -k "thermo_ or paired_"
 
   installed-wheel:
     name: Installed wheel smoke test
