@@ -185,6 +185,10 @@ for full details.
 
 ## Change Log
 
+### Version 1.0.3
+
+Fixes to Thermo centroid importing.
+
 ### Version 1.0.2
 
 Well, we got too fancy and burned up a bunch of GitHub LFS bandwidth, so this version uses a smaller set of test files and removes Git LFS from the repository.
