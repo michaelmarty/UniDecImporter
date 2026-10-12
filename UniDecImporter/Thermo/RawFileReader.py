@@ -552,12 +552,13 @@ class RawFileReader(object):
                 [DotNetArrayToNPArray(segmentedScan.Positions), DotNetArrayToNPArray(segmentedScan.Intensities)])
         return self.data
 
-    def GetAverageSpectrum(self, scanrange=None, outputData=False, filter="FTMS"):
+    def GetAverageSpectrum(self, scanrange=None, outputData=False, filter="FTMS", centroid=False):
         """Gets the average spectrum from the RAW file.
 
         Args:
             scanrange = [ start scan for the chromatogram, end scan for the chromatogram.]
             outputData (bool): the output data flag.
+            centroid (bool): return Thermo's centroid stream for the averaged scan.
         """
 
         if scanrange is None:
@@ -600,7 +601,7 @@ class RawFileReader(object):
         # type of data, different methods will be used to read the data.  While the ReadAllSpectra
         # method demonstrates reading the data using the Scan.FromFile method, generating the
         # Scan object takes more time and memory to do, so that method isn't optimum.
-        if scanStatistics.IsCentroidScan:
+        if centroid or scanStatistics.IsCentroidScan:
             # Get the centroid (label) data from the RAW file for this
             # scan
             centroidStream = averageScan.CentroidScan

@@ -104,7 +104,10 @@ def test_thermo_cdms_reader(data_dir):
     try:
         centroid = importer.grab_centroid_data(importer.scans[0])
         assert centroid.shape[1] == 2
-        assert importer.grab_all_centroid_dat().shape[1] == 2
+        average_centroid = importer.grab_all_centroid_dat()
+        assert average_centroid.shape[1] == 2
+        assert np.all(np.diff(average_centroid[:, 0]) >= 0)
+        assert len(average_centroid) < sum(map(len, importer.get_all_centroid_scans()))
         cdms = importer.get_cdms_data()
         assert cdms.ndim == 2 and cdms.shape[1] == 5 and len(cdms) > 100
     finally:

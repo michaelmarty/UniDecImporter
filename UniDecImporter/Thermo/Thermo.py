@@ -73,17 +73,9 @@ class ThermoImporter(Importer):
         return impdat
 
     def grab_all_centroid_dat(self):
-        """Concatenate centroid peaks from every scan."""
-        data = []
-        for i in range(len(self.scans)):
-            impdat = np.array(self.msrun.GetCentroidSpectrum(self.scans[i]))
-
-            impdat = impdat[impdat[:, 0] > 10]
-            data.append(impdat)
-        if len(data) > 0:
-            return np.vstack(data)
-        else:
-            return np.empty((0, 2))
+        """Return Thermo's centroid spectrum for the averaged scan range."""
+        data = np.array(self.msrun.GetAverageSpectrum(self.scan_range, centroid=True))
+        return data[data[:, 0] > 10]
 
     def get_avg_scan(self, scan_range=None, time_range=None, sum_mode=False):
         """Return averaged intensities, or summed intensities when *sum_mode* is true."""
