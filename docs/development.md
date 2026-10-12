@@ -17,6 +17,8 @@ The tests are grouped as follows:
 - unmarked tests cover numerical helpers, factory dispatch, batch parsing, error paths,
   and generated small files;
 - `integration` tests read the full bundled data from every open format;
+- open-format tests run on x86-64 and ARM64, including native Linux and Windows ARM64
+  runners;
 - `vendor` tests require Windows x86-64; Waters and Agilent also require a locally
   licensed SDK.
 

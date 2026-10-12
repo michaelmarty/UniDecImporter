@@ -26,9 +26,10 @@ For Thermo RAW support on Windows x86-64, install the optional bridge too:
 python -m pip install "UniDecImporter[thermo]"
 ```
 
-Python 3.10–3.13 is supported on Windows, macOS, and Linux. Open formats work on all
-three operating systems. The package includes Windows-only Thermo .NET assemblies as
-data files, but importing and using open-format readers does not load them.
+Python 3.10–3.13 is supported on Windows, macOS, and Linux. Open formats are tested on
+x86-64 and ARM64 across these operating systems. The package includes Windows-only
+Thermo .NET assemblies as data files, but importing and using open-format readers does
+not load them.
 
 > **Thermo proprietary software:** Installing or using the bundled Thermo RawFileReader
 > assemblies means you accept Thermo's separate license, included in the distribution.
@@ -171,7 +172,8 @@ python -m pytest
 ```
 
 The suite includes fast numerical/unit tests, cross-platform integration tests against
-the bundled open formats, and separately marked Windows vendor tests:
+the bundled open formats, native ARM64 tests on Linux and Windows, and separately marked
+Windows x86-64 vendor tests:
 
 ```shell
 python -m pytest -m "not integration and not vendor"
@@ -188,6 +190,8 @@ for full details.
 ### Version 1.0.3
 
 Fixes to Thermo centroid importing.
+
+Added linux and Windows ARM builds, which won't support the full vendor formats but will work.
 
 ### Version 1.0.2
 

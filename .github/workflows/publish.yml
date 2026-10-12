@@ -105,9 +105,38 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
+  arm64-wheel-smoke:
+    name: Test distribution / ${{ matrix.platform }} ARM64
+    needs: build
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Linux
+            runner: ubuntu-24.04-arm
+          - platform: Windows
+            runner: windows-11-arm
+    steps:
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          architecture: arm64
+      - name: Verify native ARM64 runner
+        run: python -c "import platform; machine = platform.machine().lower(); assert machine in ('aarch64', 'arm64'), f'Expected ARM64, found {machine}'"
+      - uses: actions/download-artifact@v8
+        with:
+          name: distributions
+          path: dist
+      - name: Install wheel
+        run: python -c "import glob, subprocess, sys; wheels = glob.glob('dist/*.whl'); assert len(wheels) == 1, wheels; subprocess.check_call([sys.executable, '-m', 'pip', 'install', wheels[0]])"
+      - name: Read an open-format file outside the checkout
+        working-directory: ${{ runner.temp }}
+        run: python -c "from pathlib import Path; Path('spectrum.txt').write_text('100 2\n101 3\n'); from UniDecImporter import get_importer; data = get_importer('spectrum.txt').get_avg_scan(); assert data.shape == (2, 2)"
+
   github-release:
     if: github.event_name == 'workflow_dispatch'
-    needs: [metadata, build]
+    needs: [metadata, build, arm64-wheel-smoke]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -126,8 +155,9 @@ jobs:
       always() &&
       (github.event_name == 'release' || github.event.inputs.publish_to_pypi == 'true') &&
       (github.event_name == 'release' || needs.github-release.result == 'success') &&
-      needs.metadata.result == 'success' && needs.build.result == 'success'
-    needs: [metadata, build, github-release]
+      needs.metadata.result == 'success' && needs.build.result == 'success' &&
+      needs.arm64-wheel-smoke.result == 'success'
+    needs: [metadata, build, arm64-wheel-smoke, github-release]
     runs-on: ubuntu-latest
     environment:
       name: pypi

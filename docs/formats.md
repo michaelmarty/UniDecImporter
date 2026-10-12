@@ -10,8 +10,9 @@
 - BIN: interleaved float64 m/z and intensity pairs.
 - I2MS and DMT: SQLite ion-event databases.
 
-These readers are tested on Windows, macOS, and Linux. Open-format modules are imported
-without loading any vendor runtime.
+These readers are tested on Windows, macOS, and Linux. Continuous integration covers
+x86-64 and ARM64: both architectures on macOS, plus native ARM64 jobs on Linux and
+Windows. Open-format modules are imported without loading any vendor runtime.
 
 ## Windows vendor formats
 

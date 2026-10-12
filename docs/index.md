@@ -1,7 +1,8 @@
 # UniDecImporter
 
 UniDecImporter reads open and vendor mass-spectrometry formats through one NumPy-based
-API. It is independent of UniDec and runs on Windows, macOS, and Linux for open formats.
+API. It is independent of UniDec and runs on Windows, macOS, and Linux for open formats,
+with x86-64 and ARM64 covered by continuous integration.
 
 ```python
 from UniDecImporter import get_importer
@@ -12,4 +13,3 @@ with get_importer("sample.mzML") as reader:
 
 Continue with [Getting started](getting-started.md), review the
 [format matrix](formats.md), or open the [Python API](api.md).
-
