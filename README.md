@@ -12,6 +12,7 @@ from UniDecImporter import get_importer
 with get_importer("run.mzML") as reader:
     spectrum = reader.get_avg_scan(time_range=(2.0, 2.5))
     tic = reader.get_tic()
+    bpc = reader.get_bpc()
 ```
 
 ## Installation
@@ -110,11 +111,15 @@ reader range.
 
 ### Chromatograms
 
-These methods require `reader.chrom_support`:
+TIC and EIC access require `reader.chrom_support`. `get_bpc()` is available through a
+format-independent scan-based implementation, with native vendor chromatograms used
+when supported:
 
 | Method | Description |
 |---|---|
 | `get_tic()` | Return the total-ion chromatogram as `N x 2` (retention time, intensity). |
+| `get_bpc()` | Return the base-peak chromatogram as `N x 2` (retention time, maximum scan intensity). |
+| `get_bpi()` | Alias for `get_bpc()`. |
 | `index_scans(min_mz, bin_width)` | Build or replace the in-memory MS1 peak index used for extracted-ion chromatograms. |
 | `get_eic(mass, mz_tol, rt_range=None)` | Return an extracted-ion chromatogram around `mass`; `mz_tol` is an absolute m/z tolerance and `rt_range` is optional. The default index is built automatically on first use. |
 
@@ -186,6 +191,12 @@ See the [documentation](https://michaelmarty.github.io/UniDecImporter/),
 for full details.
 
 ## Change Log
+
+### Version 1.0.4
+
+Added `get_bpc()` for base-peak chromatograms. Thermo, Waters, and Agilent readers use
+their native chromatogram APIs where available; other formats calculate the maximum
+intensity in each scan. Added unit, integration, and paired-format consistency tests.
 
 ### Version 1.0.3
 

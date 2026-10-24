@@ -107,7 +107,17 @@ def test_open_format_metadata_and_single_scan(open_importer):
 def test_open_format_tic_average_and_eic(open_importer):
     importer = open_importer
     tic = importer.get_tic()
-    assert tic.shape == (len(importer.scans), 2)
+    bpc = importer.get_bpc()
+    assert tic.shape == bpc.shape == (len(importer.scans), 2)
+    np.testing.assert_allclose(bpc[:, 0], tic[:, 0], rtol=0, atol=1e-5)
+    assert np.all(bpc[:, 1] >= 0)
+    assert np.all(bpc[:, 1] <= tic[:, 1])
+    assert np.any(bpc[:, 1] < tic[:, 1])
+    expected = np.asarray([
+        np.max(spectrum[:, 1]) if len(spectrum) else 0.0
+        for spectrum in importer.data
+    ])
+    np.testing.assert_array_equal(bpc[:, 1], expected)
     average = importer.get_avg_scan(scan_range=(importer.scans[0], importer.scans[2]))
     assert average.ndim == 2 and average.shape[1] == 2 and len(average) > 20
     importer.index_scans(0, 1)
@@ -121,6 +131,24 @@ def test_open_format_time_scan_roundtrip(open_importer):
     start, end = importer.scans[1], importer.scans[-2]
     times = importer.get_times_from_scans((start, end))
     assert importer.get_scans_from_times((times[0], times[2])) == [start, end]
+
+
+@pytest.mark.integration
+def test_open_format_base_peak_chromatograms_are_consistent(data_dir):
+    importers = []
+    try:
+        for filename in ("test_mzml.mzML", "test_mzmlgz.mzML.gz", "test_mzxml.mzXML"):
+            path = require_real_data(data_dir / filename, minimum_size=1_000_000)
+            importers.append(get_importer(path))
+
+        reference = importers[0].get_bpc()
+        for importer in importers[1:]:
+            bpc = importer.get_bpc()
+            np.testing.assert_allclose(bpc[:, 0], reference[:, 0], rtol=0, atol=1e-5)
+            np.testing.assert_array_equal(bpc[:, 1], reference[:, 1])
+    finally:
+        for importer in importers:
+            importer.close()
 
 
 @pytest.mark.integration

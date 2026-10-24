@@ -376,7 +376,7 @@ class RawFileReader(object):
         print()
 
     def GetChromatogram(self, scanrange=None, trace_number=0):
-        """Reads the base peak chromatogram for the RAW file.
+        """Reads the total-ion chromatogram for the RAW file.
         Args:
             scanrange = [ start scan for the chromatogram, end scan for the chromatogram.]
         """
@@ -393,6 +393,20 @@ class RawFileReader(object):
         self.ticdat = np.transpose(
             [DotNetArrayToNPArray(trace[trace_number].Times), DotNetArrayToNPArray(trace[trace_number].Intensities)])
         return self.ticdat
+
+    def GetBasePeakChromatogram(self, scanrange=None, trace_number=0):
+        """Read the base-peak chromatogram for the RAW file."""
+        if scanrange is None:
+            scanrange = [self.FirstSpectrumNumber, self.LastSpectrumNumber]
+        settings = ChromatogramTraceSettings(TraceType.BasePeak)
+        data = self.source.GetChromatogramData(
+            [settings], int(scanrange[0]), int(scanrange[1])
+        )
+        trace = ChromatogramSignal.FromChromatogramData(data)
+        return np.transpose([
+            DotNetArrayToNPArray(trace[trace_number].Times),
+            DotNetArrayToNPArray(trace[trace_number].Intensities),
+        ])
 
     def Get_EIC(self, massrange=None, scanrange=None, trace_number=0):
         """Reads the base peak chromatogram for the RAW file.

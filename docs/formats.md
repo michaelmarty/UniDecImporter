@@ -36,3 +36,6 @@ Waters companion DLLs should be placed beside `MassLynxRaw.dll` or otherwise be 
 to the Windows loader.
 
 Agilent `.d` reads spectra and chromatograms through the MassHunter Data Access SDK.
+Thermo, Waters, and Agilent readers request native base-peak chromatograms from their
+vendor APIs. Open formats and readers without a native BPC calculate the maximum
+intensity in each scan.

@@ -7,7 +7,7 @@ authors:
     given-names: Michael T.
     email: mtmarty@utexas.edu
 abstract: Standalone readers for open and vendor mass-spectrometry data formats.
-version: "1.0.0"
+version: "1.0.4"
 repository-code: "https://github.com/michaelmarty/UniDecImporter"
 url: "https://michaelmarty.github.io/UniDecImporter/"
 license: BSD-3-Clause

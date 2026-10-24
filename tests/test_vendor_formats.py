@@ -12,6 +12,17 @@ PAIRED_FILES = ("test_thermo.RAW", "test_mzml.mzML", "test_mzxml.mzXML", "test_m
 PAIRED_SCAN_COUNT = 424
 
 
+def assert_bpc_matches_tic_layout(importer):
+    tic = importer.get_tic()
+    bpc = importer.get_bpc()
+    assert bpc.shape == tic.shape == (len(importer.scans), 2)
+    np.testing.assert_allclose(bpc[:, 0], tic[:, 0], rtol=0, atol=1e-5)
+    assert np.all(bpc[:, 1] >= 0)
+    assert np.all(bpc[:, 1] <= tic[:, 1])
+    assert np.any(bpc[:, 1] < tic[:, 1])
+    return bpc
+
+
 def open_vendor_or_skip(path, **kwargs):
     if not WINDOWS_X64:
         pytest.skip("vendor readers require Windows x86-64")
@@ -77,6 +88,17 @@ def test_paired_scan_count_and_retention_time(paired_spectra):
 
 @pytest.mark.vendor
 @pytest.mark.integration
+def test_paired_base_peak_chromatograms_are_consistent(paired_spectra):
+    reference = assert_bpc_matches_tic_layout(paired_spectra["test_thermo.RAW"][0])
+    for importer, _, _ in paired_spectra.values():
+        bpc = assert_bpc_matches_tic_layout(importer)
+        np.testing.assert_allclose(bpc[:, 0], reference[:, 0], rtol=0, atol=1e-5)
+        assert np.corrcoef(reference[:, 1], bpc[:, 1])[0, 1] > 0.999
+        np.testing.assert_allclose(bpc[:, 1], reference[:, 1], rtol=0.07)
+
+
+@pytest.mark.vendor
+@pytest.mark.integration
 def test_thermo_lcms_reader(data_dir):
     importer = open_vendor_or_skip(data_dir / "test_thermo.RAW", silent=True)
     try:
@@ -86,7 +108,7 @@ def test_thermo_lcms_reader(data_dir):
         assert scan.ndim == 2 and scan.shape[1] == 2
         average = importer.get_avg_scan(scan_range=(importer.scans[0], importer.scans[2]))
         assert average.shape[1] == 2
-        assert importer.get_tic().shape[1] == 2
+        assert_bpc_matches_tic_layout(importer)
         assert importer.get_eic(1000, 1).shape[1] == 2
         assert importer.get_inj_time_array().shape == importer.scans.shape
         assert importer.get_analog_voltage1().shape == importer.scans.shape
@@ -125,8 +147,8 @@ def test_waters_lcms_reader(data_dir):
         scans = importer.get_all_scans()
         assert len(scans) == len(importer.scans)
         assert importer.get_avg_scan(scan_range=(1, 3)).shape[1] == 2
-        assert importer.get_tic().shape == (len(importer.scans), 2)
-        assert importer.get_bpi().shape == (len(importer.scans), 2)
+        bpc = assert_bpc_matches_tic_layout(importer)
+        np.testing.assert_allclose(importer.get_bpi(), bpc)
         assert importer.get_polarity() in {"Positive", "Negative"}
         assert importer.get_ms_order() >= 1
         importer.index_scans(0, 1)
@@ -163,7 +185,7 @@ def test_agilent_lcms_reader(data_dir):
         scan = importer.get_single_scan(importer.scans[0])
         assert scan.ndim == 2 and scan.shape[1] == 2
         assert importer.get_avg_scan(scan_range=(importer.scans[0], importer.scans[2])).shape[1] == 2
-        assert importer.get_tic().shape[1] == 2
+        assert_bpc_matches_tic_layout(importer)
         assert importer.get_eic(1000, 1).shape[1] == 2
         assert importer.get_polarity(importer.scans[0]) in {"Positive", "Negative"}
         assert importer.get_ms_order(importer.scans[0]) >= 1

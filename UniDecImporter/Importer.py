@@ -112,6 +112,27 @@ class Importer:
             raise NotImplementedError("chromatograms are not supported by this reader")
         raise NotImplementedError
 
+    def get_bpc(self):
+        """Return the base-peak chromatogram as time and intensity columns.
+
+        Readers with a native base-peak chromatogram should override this method.
+        The format-independent implementation uses the maximum intensity in each
+        scan and assigns zero to empty scans.
+        """
+        spectra = self.get_all_scans()
+        intensities = []
+        for spectrum in spectra:
+            spectrum = np.asarray(spectrum)
+            if spectrum.ndim == 2 and spectrum.shape[0] and spectrum.shape[1] >= 2:
+                intensities.append(np.max(spectrum[:, 1]))
+            else:
+                intensities.append(0.0)
+        return np.column_stack((np.asarray(self.times), intensities))
+
+    def get_bpi(self):
+        """Return the base-peak chromatogram as an alias for :meth:`get_bpc`."""
+        return self.get_bpc()
+
     def index_scans(self, min_mz, bin_width):
         """Build an in-memory MS1 peak index for extracted-ion chromatograms.
 

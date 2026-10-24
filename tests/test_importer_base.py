@@ -30,6 +30,9 @@ class DummyImporter(Importer):
     def get_avg_scan(self, scan_range=None, time_range=None, sum_mode=False):
         return self.avg_fast(scan_range, time_range, sum_mode=sum_mode)
 
+    def get_tic(self):
+        return np.column_stack((self.times, [np.sum(spectrum[:, 1]) for spectrum in self._spectra]))
+
     def get_all_imms_scans(self):
         self.immsdata = [
             np.array([[100, 1, 1], [100, 2, 2], [101, 1, 3], [101, 2, 4]], dtype=float)
@@ -82,6 +85,25 @@ def test_base_chromatogram_cdms_and_imms(tmp_path):
     assert importer.get_cdms_data().shape == (9, 5)
     assert importer.get_imms_scan(3).shape == (4, 3)
     assert importer.get_imms_avg_scan(mzbins=1).shape[1] == 3
+
+
+def test_base_peak_chromatogram_uses_scan_maxima(tmp_path):
+    path = tmp_path / "dummy.raw"
+    path.write_bytes(b"x")
+    importer = DummyImporter(path)
+    tic = importer.get_tic()
+    bpc = importer.get_bpc()
+    np.testing.assert_array_equal(
+        bpc,
+        [[0.0, 2.0], [1.0, 4.0], [2.0, 6.0]],
+    )
+    assert bpc.shape == tic.shape
+    np.testing.assert_array_equal(bpc[:, 0], tic[:, 0])
+    assert np.all(bpc[:, 1] < tic[:, 1])
+    np.testing.assert_array_equal(importer.get_bpi(), bpc)
+
+    importer._spectra[1] = np.empty((0, 2))
+    np.testing.assert_array_equal(importer.get_bpc()[:, 1], [2.0, 0.0, 6.0])
 
 
 def test_base_abstract_and_capability_errors(tmp_path):

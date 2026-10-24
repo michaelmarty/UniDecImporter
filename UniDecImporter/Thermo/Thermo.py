@@ -99,6 +99,10 @@ class ThermoImporter(Importer):
         """Return the total-ion chromatogram."""
         return self.msrun.GetChromatogram()
 
+    def get_bpc(self):
+        """Return the base-peak chromatogram."""
+        return self.msrun.GetBasePeakChromatogram()
+
     def get_eic(self, mass, mz_tol, rt_range=None):
         """Return an extracted-ion chromatogram for the selected time range."""
         mass_range = [mass-(mz_tol/2), mass+(mz_tol/2)]

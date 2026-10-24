@@ -64,6 +64,13 @@ class AgilentImporter(Importer):
         """Return the total-ion chromatogram."""
         return np.asarray(self.msrun.xic(filter="Full"), dtype=float)
 
+    def get_bpc(self):
+        """Return the base-peak chromatogram."""
+        try:
+            return np.asarray(self.msrun.bpc(), dtype=float)
+        except Exception:
+            return super().get_bpc()
+
     def get_eic(self, mass, mz_tol, rt_range=None):
         """Return an extracted-ion chromatogram using an absolute m/z tolerance."""
         start_time, stop_time = (None, None) if rt_range is None else rt_range

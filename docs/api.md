@@ -50,11 +50,16 @@ string and preserves the historical positive fallback on read failure.
 ### Chromatograms
 
 - `get_tic()` returns `N x 2` retention-time/intensity data.
+- `get_bpc()` returns `N x 2` retention-time/maximum-scan-intensity data. The base
+  implementation calculates the maximum intensity in each scan and returns zero for an
+  empty scan. Vendor readers may override it with an equivalent native chromatogram.
+- `get_bpi()` is an alias for `get_bpc()`.
 - `index_scans(min_mz, bin_width)` builds the in-memory MS1 peak index used by EICs.
 - `get_eic(mass, mz_tol, rt_range=None)` returns an extracted-ion chromatogram using an
   absolute m/z tolerance and builds a default index on first use.
 
-These operations require `chrom_support`.
+TIC, indexing, and EIC operations require `chrom_support`. BPC has a scan-based fallback
+for every reader that implements `get_all_scans()`.
 
 ### CD-MS and ion mobility
 

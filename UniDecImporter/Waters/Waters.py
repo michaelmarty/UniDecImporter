@@ -125,12 +125,10 @@ class WatersDataImporter(Importer):
         # self.readerLC.__del__()
         return tic
 
-    def get_bpi(self):
-        """Return the base-peak intensity chromatogram."""
+    def get_bpc(self):
+        """Return the base-peak chromatogram."""
         self.readerLC = MLCR.MassLynxRawChromatogramReader(self._file_path)
-        tic = np.transpose(self.readerLC.ReadBPI(self.function))
-        return tic
-
+        return np.transpose(self.readerLC.ReadBPI(self.function))
 
     def get_all_imms_scans(self):
         """Load ion-mobility data for every scan."""

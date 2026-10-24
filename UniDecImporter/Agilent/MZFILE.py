@@ -157,6 +157,21 @@ class MZFile:
         chromatogram = self.source.GetChromatogram(self.source, chrom_filter).Get(0)
         return list(zip(chromatogram.XArray, chromatogram.YArray))
 
+    def bpc(self):
+        """Return the full-MS base-peak chromatogram."""
+        chrom_filter = BDAChromFilter()
+        chrom_filter.set_MSLevelFilter(chrom_filter, MSLevel.MS)
+        chrom_filter.set_ChromatogramType(chrom_filter, ChromType.BasePeak)
+        chrom_filter.set_SingleChromatogramForAllMasses(chrom_filter, True)
+
+        rt_range = MinMaxRange()
+        rt_range.set_Min(0.0)
+        rt_range.set_Max(999999.0)
+        chrom_filter.set_ScanRange(chrom_filter, rt_range)
+
+        chromatogram = self.source.GetChromatogram(self.source, chrom_filter).Get(0)
+        return list(zip(chromatogram.XArray, chromatogram.YArray))
+
     def uv_trace(self):
         devices = self.source.GetNonmsDevices()
         if not devices.Length:
