@@ -103,7 +103,7 @@ class ThermoImporter(Importer):
         """Return the base-peak chromatogram."""
         return self.msrun.GetBasePeakChromatogram()
 
-    def get_eic(self, mass, mz_tol, rt_range=None):
+    def get_eic(self, mass, mz_tol=1.0, rt_range=None):
         """Return an extracted-ion chromatogram for the selected time range."""
         mass_range = [mass-(mz_tol/2), mass+(mz_tol/2)]
         if rt_range is not None:

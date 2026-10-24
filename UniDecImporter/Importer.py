@@ -133,6 +133,24 @@ class Importer:
         """Return the base-peak chromatogram as an alias for :meth:`get_bpc`."""
         return self.get_bpc()
 
+    def get_chrom(self, type="TIC", mz=None, mz_tol=1.0):
+        """Return a chromatogram selected by type.
+
+        ``type`` accepts ``"TIC"``, ``"BPC"``/``"BPI"``, and
+        ``"EIC"``/``"XIC"``. Extracted-ion chromatograms require ``mz``;
+        ``mz_tol`` is the absolute m/z tolerance passed to :meth:`get_eic`.
+        """
+        chrom_type = str(type).upper()
+        if chrom_type == "TIC":
+            return self.get_tic()
+        if chrom_type in {"BPC", "BPI"}:
+            return self.get_bpc()
+        if chrom_type in {"EIC", "XIC"}:
+            if mz is None:
+                raise ValueError(f"mz is required for {chrom_type} chromatograms")
+            return self.get_eic(mz, mz_tol)
+        raise ValueError(f"unsupported chromatogram type: {type}")
+
     def index_scans(self, min_mz, bin_width):
         """Build an in-memory MS1 peak index for extracted-ion chromatograms.
 
@@ -153,11 +171,11 @@ class Importer:
                     self.indexed_file.indexed_scans.append(ind_scan)
         return
 
-    def get_eic(self, mass, mz_tol, rt_range=None):
+    def get_eic(self, mass, mz_tol=1.0, rt_range=None):
         """Return an extracted-ion chromatogram around *mass*.
 
-        ``mz_tol`` is an absolute m/z tolerance. ``rt_range``, when supplied, is a
-        two-value retention-time range in minutes.
+        ``mz_tol`` is an absolute m/z tolerance and defaults to 1.0. ``rt_range``,
+        when supplied, is a two-value retention-time range in minutes.
         """
         if not self.chrom_support:
             print("EIC data not supported for this file type:", self._file_path)

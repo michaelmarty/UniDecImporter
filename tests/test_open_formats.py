@@ -121,7 +121,7 @@ def test_open_format_tic_average_and_eic(open_importer):
     average = importer.get_avg_scan(scan_range=(importer.scans[0], importer.scans[2]))
     assert average.ndim == 2 and average.shape[1] == 2 and len(average) > 20
     importer.index_scans(0, 1)
-    eic = importer.get_eic(float(average[len(average) // 2, 0]), 0.5)
+    eic = importer.get_eic(float(average[len(average) // 2, 0]))
     assert eic.shape == (np.count_nonzero(importer.levels == 1), 2)
 
 

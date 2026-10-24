@@ -120,6 +120,7 @@ when supported:
 | `get_tic()` | Return the total-ion chromatogram as `N x 2` (retention time, intensity). |
 | `get_bpc()` | Return the base-peak chromatogram as `N x 2` (retention time, maximum scan intensity). |
 | `get_bpi()` | Alias for `get_bpc()`. |
+| `get_chrom(type="TIC", mz=None, mz_tol=1.0)` | Dispatch to TIC, BPC/BPI, or EIC/XIC chromatogram access. EIC/XIC requires `mz`; `mz_tol` is an absolute tolerance. |
 | `index_scans(min_mz, bin_width)` | Build or replace the in-memory MS1 peak index used for extracted-ion chromatograms. |
 | `get_eic(mass, mz_tol, rt_range=None)` | Return an extracted-ion chromatogram around `mass`; `mz_tol` is an absolute m/z tolerance and `rt_range` is optional. The default index is built automatically on first use. |
 
@@ -194,7 +195,8 @@ for full details.
 
 ### Version 1.0.4
 
-Added `get_bpc()` for base-peak chromatograms. Thermo, Waters, and Agilent readers use
+Added `get_bpc()` for base-peak chromatograms and `get_chrom()` for unified TIC, BPC,
+and EIC dispatch. Thermo, Waters, and Agilent readers use
 their native chromatogram APIs where available; other formats calculate the maximum
 intensity in each scan. Added unit, integration, and paired-format consistency tests.
 
@@ -202,7 +204,7 @@ intensity in each scan. Added unit, integration, and paired-format consistency t
 
 Fixes to Thermo centroid importing.
 
-Added linux and Windows ARM builds, which won't support the full vendor formats but will work.
+Added linux and Windows ARM builds, which won't support the full vendor formats but will work for open formats.
 
 ### Version 1.0.2
 

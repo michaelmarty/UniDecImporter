@@ -71,7 +71,7 @@ class AgilentImporter(Importer):
         except Exception:
             return super().get_bpc()
 
-    def get_eic(self, mass, mz_tol, rt_range=None):
+    def get_eic(self, mass, mz_tol=1.0, rt_range=None):
         """Return an extracted-ion chromatogram using an absolute m/z tolerance."""
         start_time, stop_time = (None, None) if rt_range is None else rt_range
         return np.asarray(self.msrun.xic(

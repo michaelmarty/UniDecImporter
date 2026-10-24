@@ -109,7 +109,7 @@ def test_thermo_lcms_reader(data_dir):
         average = importer.get_avg_scan(scan_range=(importer.scans[0], importer.scans[2]))
         assert average.shape[1] == 2
         assert_bpc_matches_tic_layout(importer)
-        assert importer.get_eic(1000, 1).shape[1] == 2
+        assert importer.get_eic(1000).shape[1] == 2
         assert importer.get_inj_time_array().shape == importer.scans.shape
         assert importer.get_analog_voltage1().shape == importer.scans.shape
         assert importer.get_analog_voltage2().shape == importer.scans.shape
@@ -152,7 +152,7 @@ def test_waters_lcms_reader(data_dir):
         assert importer.get_polarity() in {"Positive", "Negative"}
         assert importer.get_ms_order() >= 1
         importer.index_scans(0, 1)
-        assert importer.get_eic(1000, 1).shape == (len(importer.scans), 2)
+        assert importer.get_eic(1000).shape == (len(importer.scans), 2)
     finally:
         importer.close()
 
@@ -186,7 +186,7 @@ def test_agilent_lcms_reader(data_dir):
         assert scan.ndim == 2 and scan.shape[1] == 2
         assert importer.get_avg_scan(scan_range=(importer.scans[0], importer.scans[2])).shape[1] == 2
         assert_bpc_matches_tic_layout(importer)
-        assert importer.get_eic(1000, 1).shape[1] == 2
+        assert importer.get_eic(1000).shape[1] == 2
         assert importer.get_polarity(importer.scans[0]) in {"Positive", "Negative"}
         assert importer.get_ms_order(importer.scans[0]) >= 1
     finally:

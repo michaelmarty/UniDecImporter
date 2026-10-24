@@ -54,9 +54,12 @@ string and preserves the historical positive fallback on read failure.
   implementation calculates the maximum intensity in each scan and returns zero for an
   empty scan. Vendor readers may override it with an equivalent native chromatogram.
 - `get_bpi()` is an alias for `get_bpc()`.
+- `get_chrom(type="TIC", mz=None, mz_tol=1.0)` dispatches to `get_tic()`, `get_bpc()`,
+  or `get_eic()`. `BPC` and `BPI` select the base-peak chromatogram; `EIC` and `XIC`
+  require `mz` and use the absolute `mz_tol` value.
 - `index_scans(min_mz, bin_width)` builds the in-memory MS1 peak index used by EICs.
-- `get_eic(mass, mz_tol, rt_range=None)` returns an extracted-ion chromatogram using an
-  absolute m/z tolerance and builds a default index on first use.
+- `get_eic(mass, mz_tol=1.0, rt_range=None)` returns an extracted-ion chromatogram using
+  an absolute m/z tolerance and builds a default index on first use.
 
 TIC, indexing, and EIC operations require `chrom_support`. BPC has a scan-based fallback
 for every reader that implements `get_all_scans()`.

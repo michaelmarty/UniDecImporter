@@ -81,7 +81,9 @@ def test_base_chromatogram_cdms_and_imms(tmp_path):
     importer.index_scans(0, 1)
     # Only MS1 scans are indexed.
     assert [scan.scan_num for scan in importer.indexed_file.indexed_scans] == [1, 5]
-    assert importer.get_eic(101, 0.01).shape == (2, 2)
+    default_eic = importer.get_eic(101)
+    assert default_eic.shape == (2, 2)
+    np.testing.assert_array_equal(default_eic, importer.get_eic(101, 1.0))
     assert importer.get_cdms_data().shape == (9, 5)
     assert importer.get_imms_scan(3).shape == (4, 3)
     assert importer.get_imms_avg_scan(mzbins=1).shape[1] == 3
@@ -104,6 +106,40 @@ def test_base_peak_chromatogram_uses_scan_maxima(tmp_path):
 
     importer._spectra[1] = np.empty((0, 2))
     np.testing.assert_array_equal(importer.get_bpc()[:, 1], [2.0, 0.0, 6.0])
+
+
+def test_chromatogram_dispatch(tmp_path, monkeypatch):
+    path = tmp_path / "dummy.raw"
+    path.write_bytes(b"x")
+    importer = DummyImporter(path)
+    calls = []
+    monkeypatch.setattr(importer, "get_tic", lambda: calls.append(("TIC",)) or "tic")
+    monkeypatch.setattr(importer, "get_bpc", lambda: calls.append(("BPC",)) or "bpc")
+    monkeypatch.setattr(
+        importer,
+        "get_eic",
+        lambda mz, mz_tol: calls.append(("EIC", mz, mz_tol)) or "eic",
+    )
+
+    assert importer.get_chrom() == "tic"
+    assert importer.get_chrom(type="TIC") == "tic"
+    assert importer.get_chrom(type="BPC") == "bpc"
+    assert importer.get_chrom(type="BPI") == "bpc"
+    assert importer.get_chrom(type="EIC", mz=100) == "eic"
+    assert importer.get_chrom(type="XIC", mz=200, mz_tol=0.25) == "eic"
+    assert calls == [
+        ("TIC",),
+        ("TIC",),
+        ("BPC",),
+        ("BPC",),
+        ("EIC", 100, 1.0),
+        ("EIC", 200, 0.25),
+    ]
+
+    with pytest.raises(ValueError, match="mz is required"):
+        importer.get_chrom(type="EIC")
+    with pytest.raises(ValueError, match="unsupported chromatogram type"):
+        importer.get_chrom(type="unknown")
 
 
 def test_base_abstract_and_capability_errors(tmp_path):
