@@ -31,6 +31,7 @@ classifiers = [
 ]
 dependencies = [
     "numpy>=1.23",
+    "openpyxl>=3.1",
     "pymzml>=2.5",
     "pyteomics[XML]>=4.6",
 ]

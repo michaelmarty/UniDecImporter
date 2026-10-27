@@ -4,8 +4,9 @@
 
 - mzML and indexed mzML.gz: LC-MS, MS/MS, CD-MS, and ion mobility through pymzML.
 - mzXML: LC-MS, MS/MS, and CD-MS through pyteomics.
-- TXT, DAT, and CSV: single spectra plus three-column ion-mobility and multi-column
+- TXT, DAT, CSV, and TSV: single spectra plus three-column ion-mobility and multi-column
   CD-MS data.
+- XLSX: single spectra from the active worksheet's first two columns through openpyxl.
 - NPZ: the `data` member may contain two or more columns.
 - BIN: interleaved float64 m/z and intensity pairs.
 - I2MS and DMT: SQLite ion-event databases.

@@ -1,4 +1,4 @@
-"""Reader for spectra stored directly in text, NumPy, or binary arrays."""
+"""Reader for spectra stored directly in text, Excel, NumPy, or binary arrays."""
 
 import os
 import warnings
@@ -8,7 +8,7 @@ from .ImportTools import header_test
 
 
 class SingleScanImporter(Importer):
-    """Read a single spectrum from TXT, DAT, CSV, NPZ, or BIN data."""
+    """Read a single spectrum from text, Excel, NumPy, or binary data."""
 
     def __init__(self, filename, **kwargs):
         """Open *filename* and load its array data."""
@@ -37,9 +37,23 @@ class SingleScanImporter(Importer):
         ext = self.ext.lower()
         if ext == ".txt" or ext == ".dat":
             self.data = np.loadtxt(self._file_path, skiprows=header_test(self._file_path))
-        elif ext == ".csv":
-            self.data = np.loadtxt(self._file_path, delimiter=",", skiprows=header_test(self._file_path),
+        elif ext in {".csv", ".tsv"}:
+            delimiter = "," if ext == ".csv" else "\t"
+            self.data = np.loadtxt(self._file_path, delimiter=delimiter, skiprows=header_test(self._file_path),
                                    usecols=(0, 1))
+        elif ext == ".xlsx":
+            from openpyxl import load_workbook
+
+            workbook = load_workbook(self._file_path, read_only=True, data_only=True)
+            try:
+                rows = list(workbook.active.iter_rows(min_col=1, max_col=2, values_only=True))
+            finally:
+                workbook.close()
+            try:
+                np.asarray(rows[0], dtype=float)
+            except (IndexError, TypeError, ValueError):
+                rows = rows[1:]
+            self.data = np.asarray(rows, dtype=float)
         elif ext == '.npz':
             try:
                 with np.load(self._file_path, allow_pickle=False) as archive:

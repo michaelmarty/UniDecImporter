@@ -16,6 +16,8 @@ from UniDecImporter.ImporterFactory import UnsupportedFormatError, VendorReaderU
 def test_public_api_and_factory_instance():
     assert get_importer is not None
     assert ".mzml" in ImporterFactory().recognized_file_types
+    assert ".tsv" in ImporterFactory().recognized_file_types
+    assert ".xlsx" in ImporterFactory().recognized_file_types
     assert ".raw" in UniDecImporter.recognized_types
 
 

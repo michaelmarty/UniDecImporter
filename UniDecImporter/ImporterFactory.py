@@ -24,8 +24,8 @@ class VendorReaderUnavailableError(UniDecImporterError):
     """Raised when a vendor reader cannot run on the current platform."""
 
 
-OPEN_FORMATS = (".mzxml", ".mzml", ".mzml.gz", ".gz", ".txt", ".dat", ".csv",
-                ".npz", ".i2ms", ".dmt", ".bin")
+OPEN_FORMATS = (".mzxml", ".mzml", ".mzml.gz", ".gz", ".txt", ".dat", ".csv", ".tsv",
+                ".xlsx", ".npz", ".i2ms", ".dmt", ".bin")
 VENDOR_FORMATS = (".raw", ".d")
 recognized_types = list(VENDOR_FORMATS + OPEN_FORMATS)
 
@@ -106,7 +106,7 @@ class ImporterFactory:
             return MZXMLImporter(str(path), **kwargs)
         if ending in {".mzml", ".mzml.gz", ".gz"}:
             return MZMLImporter(str(path), **kwargs)
-        if ending in {".txt", ".dat", ".csv", ".npz", ".bin"}:
+        if ending in {".txt", ".dat", ".csv", ".tsv", ".xlsx", ".npz", ".bin"}:
             return SSI.SingleScanImporter(str(path), **kwargs)
         if ending in {".dmt", ".i2ms"}:
             return I2MSImporter(str(path))

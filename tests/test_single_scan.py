@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from openpyxl import Workbook
 
 from UniDecImporter import get_importer
 from UniDecImporter.SingleScanImporter import SingleScanImporter
@@ -42,6 +43,28 @@ def test_binary_pairs_and_case_insensitive_extension(tmp_path):
     np.array([[100.0, 2.0], [101.0, 3.0]]).tofile(path)
     importer = get_importer(path)
     np.testing.assert_array_equal(importer.get_avg_scan(), [[100, 2], [101, 3]])
+
+
+@pytest.mark.parametrize("header", [False, True])
+def test_tsv_with_optional_header(tmp_path, header):
+    path = tmp_path / "scan.tsv"
+    rows = (["m/z\tintensity"] if header else []) + ["100\t2", "101\t3"]
+    path.write_text("\n".join(rows), encoding="utf-8")
+
+    np.testing.assert_array_equal(get_importer(path).get_avg_scan(), [[100, 2], [101, 3]])
+
+
+@pytest.mark.parametrize("header", [False, True])
+def test_excel_with_optional_header(tmp_path, header):
+    path = tmp_path / "scan.xlsx"
+    workbook = Workbook()
+    if header:
+        workbook.active.append(["m/z", "intensity"])
+    workbook.active.append([100, 2])
+    workbook.active.append([101, 3])
+    workbook.save(path)
+
+    np.testing.assert_array_equal(get_importer(path).get_avg_scan(), [[100, 2], [101, 3]])
 
 
 def test_binary_odd_value_count_is_rejected(tmp_path):

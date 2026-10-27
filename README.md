@@ -47,7 +47,8 @@ not load them.
 |---|---|---|---|
 | mzML, indexed mzML.gz | LC-MS, MS/MS, CD-MS, IM-MS | Windows, macOS, Linux | pymzML |
 | mzXML | LC-MS, MS/MS, CD-MS | Windows, macOS, Linux | pyteomics |
-| TXT, DAT, CSV | Single scan, CD-MS, IM-MS | Windows, macOS, Linux | NumPy |
+| TXT, DAT, CSV, TSV | Single scan, CD-MS, IM-MS | Windows, macOS, Linux | NumPy |
+| XLSX | Single scan | Windows, macOS, Linux | openpyxl |
 | NPZ, BIN | Single scan, CD-MS | Windows, macOS, Linux | NumPy |
 | I2MS, DMT | CD-MS | Windows, macOS, Linux | Python sqlite3 |
 | Thermo RAW | LC-MS, MS/MS, CD-MS | Windows x86-64 only | Thermo RawFileReader + pythonnet |
@@ -192,6 +193,11 @@ See the [documentation](https://michaelmarty.github.io/UniDecImporter/),
 for full details.
 
 ## Change Log
+
+### Version 1.0.5
+
+Added TSV and XLSX single-scan files containing m/z and intensity columns, with an
+optional header row.
 
 ### Version 1.0.4
 

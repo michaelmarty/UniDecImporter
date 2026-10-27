@@ -21,11 +21,12 @@ with get_importer(Path("sample.mzML")) as reader:
 Every ordinary spectrum is an `N x 2` NumPy array. CD-MS events are `N x 5`, and
 ion-mobility data are `N x 3`. Scan ranges are inclusive.
 
-Single-scan text files may begin with arbitrary header rows. TXT and DAT use whitespace;
-CSV uses commas. NPZ files must contain an array named `data`. Standard numeric NPZ files
-load without pickle support; legacy object-backed NPZ files are supported with a warning
-and must only be loaded from trusted sources. BIN files are interleaved float64 m/z and
-intensity pairs.
+Single-scan text files may begin with arbitrary header rows. TXT and DAT use whitespace,
+CSV uses commas, and TSV uses tabs. XLSX files read m/z and intensity from the active
+worksheet's first two columns and may have one header row. NPZ files must contain an
+array named `data`. Standard numeric NPZ files load without pickle support; legacy
+object-backed NPZ files are supported with a warning and must only be loaded from trusted
+sources. BIN files are interleaved float64 m/z and intensity pairs.
 
 Use the capability attributes before specialized operations:
 
